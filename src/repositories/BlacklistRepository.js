@@ -1,22 +1,18 @@
-import db from "../config/database.js";
+import pool from "../config/database.js";
 
 class BlacklistRepository {
 
-async findByDomain(dominio) {
+async findAllDomains() {
 
   const query = `
-  SELECT *
+  SELECT valor, motivo
   FROM blacklist
-  WHERE LOWER(TRIM(tipo)) = 'dominio'
-  AND LOWER(TRIM(valor)) = LOWER(TRIM($1))
-  LIMIT 1
+  WHERE tipo = 'dominio'
 `;
 
-  const { rows } = await db.query(query, [dominio]);
+  const { rows } = await pool.query(query);
    
-   console.log("buscando dominio: ", dominio)
-   
-  return rows[0] || null;
+  return rows;
 }
 
 }

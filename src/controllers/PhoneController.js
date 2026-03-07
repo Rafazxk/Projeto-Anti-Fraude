@@ -3,9 +3,9 @@ import PhoneAnalysisService from "../services/PhoneAnalysisService.js";
 class PhoneController {
   async analyze(req, res){
     try{
-      const { phone } = req.body;
+      const { numero } = req.body;
       
-      const result = await PhoneAnalysisService.execute({ phone });
+      const result = await PhoneAnalysisService.execute({ numero});
       
        console.log("resultado PhoneController: ", result);
       

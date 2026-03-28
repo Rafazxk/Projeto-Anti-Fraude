@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Guardix - Plano Free</title>
+    <link rel="stylesheet" href="css/dash.css">
+</head>
+<body class="corpo-dashboard">
+ 
+    <button class="botao-menu-mobile" onclick="alternarMenu()">☰</button>
+ 
+    <aside class="barra-lateral" id="sidebar">
+        <div class="fechar-menu-mobile" onclick="alternarMenu()">✕</div>
+        <div class="logo-painel">Guardix</div>
+        <nav class="menu-interno">
+            <a href="#" class="item-menu ativo" onclick="navegar(event, 'verificador')">🔍 Verificador</a>
+            <a href="#" class="item-menu" onclick="navegar(event, 'historico')">🕒 Histórico</a>
+            <a href="#" class="item-menu" onclick="navegar(event, 'dicas')">🛡️ Dicas</a>
+            <a href="#" class="item-menu destaque-upgrade" onclick="navegar(event, 'pro')">🚀 Virar Pro</a>
+        </nav>
+        <div class="perfil-usuario">
+            <div class="avatar">JS</div>
+            <div class="info-user">
+                <p class="nome">João Silva</p>
+                <span class="badge-plano">Plano Free</span>
+            </div>
+        </div>
+    </aside>
+ 
+    <main class="conteudo-painel">
+        <!-- Seção: Verificador -->
+        <section id="secao-verificador" class="secao-conteudo">
+            <header class="topo-painel">
+                <h1>Verificador</h1>
+                <div class="status-cota">
+                    <span>Cota Diária: <strong id="contagem-cota">0</strong>/5 consultas</span>
+                    <div class="barra-progresso"><div id="progresso-cota" class="preenchimento" style="width: 0%;"></div></div>
+                </div>
+            </header>
+            <div class="cartao-ferramenta">
+                <form id="form-analise-interna" class="formulario-interno">
+                    <div class="grupo-input">
+                        <label>Link Suspeito</label>
+                        <input type="url" id="input-url" placeholder="https://site-duvidoso.com">
+                    </div>
+                    <div class="grupo-input">
+                        <label>Telefone ou WhatsApp</label>
+                        <input type="tel" id="input-tel" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="upload-area">
+                        <input type="file" id="arquivo-print" hidden accept="image/*">
+                        <label for="arquivo-print">
+                            <span class="icone-upload">📸</span>
+                            <p>Anexar <strong>Print do Comprovante</strong></p>
+                            <span id="nome-doc">Nenhum arquivo...</span>
+                        </label>
+                    </div>
+                    <button type="submit" id="btn-analisar" class="botao-executar">Verificar Agora</button>
+                </form>
+                <div id="resultado-analise" class="resultado-box" style="display: none;">
+                    <div class="loading-container">
+                        <div class="spinner"></div>
+                        <p id="texto-status">Escaneando base de dados...</p>
+                    </div>
+                    <div id="veredito" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção: Histórico -->
+        <section id="secao-historico" class="secao-conteudo" style="display: none;">
+            <h1>🕒 Histórico de Consultas</h1>
+            <div class="tabela-container">
+                <table class="tabela-historico">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Alvo</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-historico">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Seção: Dicas -->
+        <section id="secao-dicas" class="secao-conteudo" style="display: none;">
+            <h1>🛡️ Dicas de Segurança</h1>
+            <div class="grade-dicas">
+                <div class="card-dica"><h3>Verifique a URL</h3><p>Sempre olhe se o domínio termina em .com.br oficial.</p></div>
+                <div class="card-dica"><h3>Cuidado com Urgência</h3><p>Golsitas usam frases como "Sua conta será bloqueada hoje".</p></div>
+                <div class="card-dica"><h3>Prints de PIX</h3><p>Confira sempre no extrato do banco, nunca apenas pelo print.</p></div>
+            </div>
+        </section>
+
+        <!-- Seção: Virar Pro -->
+        <section id="secao-pro" class="secao-conteudo" style="display: none;">
+            <div class="card-upgrade">
+                <h2>Acesse o Poder Total 🚀</h2>
+                <p>Consultas ilimitadas, análise de IA avançada e suporte 24h.</p>
+                <button class="botao-executar">Assinar Agora - R$ 29,90</button>
+            </div>
+        </section>
+    </main>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,43 +1,16 @@
-import axios from "axios";
-
 class ValidateNumberRule {
-  async execute(numero) {
+// No Backend (ValidateNumberRule.js)
+execute(numero) {
+  const apenasNumeros = numero.replace(/\D/g, '');
+  
+  // ACEITAR DE 10 A 15 DÍGITOS
+  const regex = /^\d{10,15}$/; 
 
-    let score = 0
-    let motivos = []
-
-    try {
-
-      const response = await axios.get(
-        `http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_KEY}&number=${numero}`
-      )
-
-      const data = response.data
-
-      if (!data.valid) {
-        score += 70
-        motivos.push("Número inválido")
-      }
-
-      if (data.line_type === "voip") {
-        score += 40
-        motivos.push("Número virtual")
-      }
-
-      if (data.country_code !== "BR") {
-        score += 35
-        motivos.push("País suspeito")
-      }
-
-    } catch (error) {
-      console.log("Erro ao validar telefone:", error.message)
-    }
-
-    return {
-      score,
-      motivos
-    }
+  if (!regex.test(apenasNumeros)) {
+    return { score: 70, message: "Número com formato internacional ou local inválido." };
   }
+  return { score: 0, message: null };
+ }
 }
 
 export default ValidateNumberRule;

@@ -1,96 +1,72 @@
+import LinkFraudEngine from "../domain/engines/LinkFraudEngine.js";
+import CheckBlacklist from "../domain/rules/link/CheckBlacklist.js";
+import CheckDomainStructure from "../domain/rules/link/CheckDomainStructure.js";
+import CheckTyposquatting from "../domain/rules/link/checkTyposquatting.js";
+import CheckDomainAge from "../domain/rules/link/checkDomainAge.js";
 import BlacklistRepository from "../repositories/BlacklistRepository.js";
 
 class LinkAnalysisService {
+  // Receba o repositório por parâmetro (Injeção de Dependência)
+  constructor(blacklistRepo) {
+    this.engine = new LinkFraudEngine([
+      new CheckBlacklist(blacklistRepo), // Usa o repo passado
+      new CheckDomainStructure(),
+      new CheckTyposquatting(),
+      new CheckDomainAge()
+    ]);
+  }
 
-  async execute({ url }) {
+  async execute(context) {
+    // 1. Extrair o domínio antes de mandar para o Engine
+    const domain = this.extractDomain(context.url);
+    if (!domain) return { status: "Erro", mensagem: "URL Inválida" };
 
-    if (!url) {
-      throw new Error("URL é obrigatória");
-    }
-
-    const domain = this.extractDomain(url);
-
-     console.log("dominio extraido: ", domain);
- 
-    if (!domain) {
-      throw new Error("URL inválida");
-    }
-
-    const blacklistDomains = await BlacklistRepository.findAllDomains();
-
-    for (const item of blacklistDomains) {
-
-      const blacklistDomain = item.valor.toLowerCase();
-
-      if (domain.endsWith(blacklistDomain)) {
+    // 2. Rodar o Engine (passando o domínio no contexto)
+    const analiseTecnica = await this.engine.execute({ ...context, domain });
+    
+    if (!analiseTecnica || analiseTecnica.score === 0) {
         return {
-          score: 400,
-          maxScore: 400,
-          classificacao: "Crítico",
-          analise: "Domínio identificado na blacklist.",
-          riscos: [`Domínio listado por: ${item.motivo}`],
-          recomendacao: "Não acesse este link."
+            status: "Seguro",
+            score: 0,
+            mensagem: "Não detectamos ameaças neste link.",
+            classificacao: "Seguro",
+            alertas: []
         };
-      }
     }
 
-    let score = 0;
-    const maxScore = 400;
-    const riscos = [];
+    const riscosTecnicos = analiseTecnica.riscos ?? [];
+    const alertasHumanos = riscosTecnicos.map(risco => {
+        if (risco.includes("marca")) return "O site tenta imitar uma empresa conhecida.";
+        if (risco.includes("TLD")) return "O endereço utiliza uma terminação suspeita.";
+        if (risco.includes("recente")) return "Este site foi criado há pouquíssimo tempo.";
+        if (risco.includes("subdomínios")) return "A estrutura do link é confusa e oculta o destino real.";
+        if (risco.includes("hífens")) return "O nome do site parece artificial e forçado.";
+        return "Atividade incomum detectada.";
+    }).filter(Boolean);
 
-    // Regra 1 — HTTP inseguro
-    if (url.startsWith("http://")) {
-      score += 100;
-      riscos.push("O link utiliza HTTP, que não é seguro.");
-    }
-
-    // Regra 2 — Palavras suspeitas
-    const suspiciousWords = ["login", "secure", "update", "verify"];
-
-    suspiciousWords.forEach(word => {
-      if (url.toLowerCase().includes(word)) {
-        score += 80;
-        riscos.push(`O link contém palavra suspeita: ${word}`);
-      }
-    });
-
-    // Regra 3 — Domínio muito longo
-    if (url.length > 30) {
-      score += 60;
-      riscos.push("O link é excessivamente longo, possível tentativa de mascaramento.");
-    }
-
-    let classificacao = "Seguro";
-
-    if (score >= 200) {
-      classificacao = "Alto Risco";
-    } else if (score >= 100) {
-      classificacao = "Médio Risco";
+    let recomendacao = "Tenha cautela ao navegar.";
+    if (analiseTecnica.score >= 200) {
+        recomendacao = "NÃO forneça senhas ou dados pessoais.";
+    } else if (analiseTecnica.score >= 100) {
+        recomendacao = "Evite realizar pagamentos neste endereço.";
     }
 
     return {
-      score,
-      maxScore,
-      classificacao,
-      analise: "Análise baseada em padrões estruturais do link.",
-      riscos,
-      recomendacao:
-        score >= 100
-          ? "Recomenda-se não acessar este link."
-          : "Nenhum risco significativo identificado."
+        url: context.url,
+        score: analiseTecnica.score,
+        classificacao: analiseTecnica.classificacao, 
+        alertas: [...new Set(alertasHumanos)], 
+        conclusao: recomendacao
     };
   }
 
   extractDomain(url) {
     try {
-      const parsed = new URL(url);
-      return parsed.hostname.replace("www.", "").toLowerCase();
-    } catch {
-      return null;
-    }
-    
-    
+      return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+    } catch { return null; }
   }
 }
 
-export default new LinkAnalysisService();
+export { LinkAnalysisService }; 
+
+export default new LinkAnalysisService(BlacklistRepository);

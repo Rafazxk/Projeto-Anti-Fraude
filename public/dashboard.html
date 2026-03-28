@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Guardix - Plano Free</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="corpo-dashboard">
+
+    <!-- Botão Menu Mobile -->
+    <button class="botao-menu-mobile" onclick="alternarMenu()">☰</button>
+
+    <!-- Barra Lateral -->
+    <aside class="barra-lateral" id="sidebar">
+        <div class="fechar-menu-mobile" onclick="alternarMenu()">✕</div>
+        <div class="logo-painel">Guardix</div>
+        <nav class="menu-interno">
+            <a href="#" class="item-menu ativo">🔍 Verificador</a>
+            <a href="#" class="item-menu">🕒 Histórico</a>
+            <a href="#" class="item-menu">🛡️ Dicas</a>
+            <a href="#" class="item-menu destaque-upgrade">🚀 Virar Pro</a>
+        </nav>
+        <div class="perfil-usuario">
+            <div class="avatar">JS</div>
+            <div class="info-user">
+                <p class="nome">João Silva</p>
+                <span class="badge-plano">Plano Free</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="conteudo-painel">
+        <header class="topo-painel">
+            <h1>Verificador</h1>
+            <div class="status-cota">
+                <span>Cota Diária: <strong id="contagem-cota">0</strong>/5 consultas</span>
+                <div class="barra-progresso"><div id="progresso-cota" class="preenchimento" style="width: 0%;"></div></div>
+            </div>
+        </header>
+
+        <section class="area-analise">
+            <div class="cartao-ferramenta">
+                <form id="form-analise-interna" class="formulario-interno">
+                    <div class="grupo-input">
+                        <label>Link Suspeito</label>
+                        <input type="url" id="input-url" placeholder="https://site-duvidoso.com">
+                    </div>
+
+                    <div class="grupo-input">
+                        <label>Telefone ou WhatsApp</label>
+                        <input type="tel" id="input-tel" placeholder="(00) 00000-0000">
+                    </div>
+
+                    <div class="upload-area">
+                        <input type="file" id="arquivo-print" hidden accept="image/*">
+                        <label for="arquivo-print">
+                            <span class="icone-upload">📸</span>
+                            <p>Anexar <strong>Print do Comprovante</strong></p>
+                            <span id="nome-doc">Nenhum arquivo...</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="btn-analisar" class="botao-executar">Verificar Agora</button>
+                </form>
+
+                <!-- Área de Resultado Funcional -->
+                <div id="resultado-analise" class="resultado-box" style="display: none;">
+                    <div class="loading-container">
+                        <div class="spinner"></div>
+                        <p id="texto-status">Escaneando base de dados...</p>
+                    </div>
+                    <div id="veredito" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let consultasRealizadas = 0;
+        const limite = 5;
+
+        // Função do Menu Mobile
+        function alternarMenu() {
+            document.getElementById('sidebar').classList.toggle('ativo');
+        }
+
+        // Mostrar nome do arquivo
+        document.getElementById('arquivo-print').addEventListener('change', function() {
+            const nome = this.files[0] ? this.files[0].name : "Nenhum arquivo...";
+            document.getElementById('nome-doc').innerText = nome;
+        });
+
+        // Lógica de Análise
+        document.getElementById('form-analise-interna').onsubmit = function(e) {
+            e.preventDefault();
+            
+            if(consultasRealizadas >= limite) {
+                alert("Cota esgotada! Faça upgrade para continuar.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-analisar');
+            const resBox = document.getElementById('resultado-analise');
+            const veredito = document.getElementById('veredito');
+            const loading = document.querySelector('.loading-container');
+
+            btn.disabled = true;
+            btn.innerText = "Processando...";
+            resBox.style.display = 'block';
+            veredito.style.display = 'none';
+            loading.style.display = 'block';
+
+            // Simulação de tempo de resposta (2 segundos)
+            setTimeout(() => {
+                consultasRealizadas++;
+                atualizarInterfaceCota();
+
+                loading.style.display = 'none';
+                veredito.style.display = 'block';
+                veredito.innerHTML = `
+                    <div class="alerta-sucesso">
+                        <h3>✅ Link Seguro</h3>
+                        <p>Nenhuma ameaça detectada em nossa lista negra atual.</p>
+                    </div>
+                `;
+                btn.disabled = false;
+                btn.innerText = "Verificar Agora";
+            }, 2000);
+        };
+
+        function atualizarInterfaceCota() {
+            document.getElementById('contagem-cota').innerText = consultasRealizadas;
+            const percentual = (consultasRealizadas / limite) * 100;
+            document.getElementById('progresso-cota').style.width = percentual + "%";
+        }
+    </script>
+</body>
+</html>

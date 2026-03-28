@@ -1,24 +1,23 @@
-// denuncias internas 
- import PhoneReportsRepository from "../../../repositories/PhoneReportsRepository.js";
- 
- class CheckReportsRule {
+import PhoneReportsRepository from "../../../repositories/PhoneReportsRepository.js";
+
+class CheckReportsRule {
+  async execute(numero) {
+    const res = await PhoneReportsRepository.countReports(numero);
     
-     async execute(numero){
-        const reports = await PhoneReportsRepository.countReports(numero);
-       
-       if(reports >= 10) {
-         return { score:70, message:"número possui muitas denúncias." };
-       }
-       
-       if(reports >= 3) {
-         return { score:40, message:"número possui várias denúncias." };
-       }
-       
-       if(reports >= 1) {
-         return { score:40, message:"número possui denúncia registrada." };
-       }
-       return null;
-     }
- }
- 
-  export default CheckReportsRule;
+    const count = parseInt(res) || 0; 
+
+    if (count === 0) {
+      return { score: 0, message: null };
+    }
+
+   console.log("numero de denuncias: ", count);
+
+    if (count >= 5) {
+      return { score: 100, message: "Muitas denúncias vinculadas a este número!" };
+    }
+    
+    return { score: 20, message: `Este número possui ${count} denúncia(s) no sistema.` };
+}
+}
+
+export default CheckReportsRule;

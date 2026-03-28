@@ -3,9 +3,7 @@ import LinkAnalysisService from "../services/LinkAnalysisService.js";
 class LinkController {
   async analyze(req, res) {
     try{
-    const { url } = req.body;
-    
-    const result = await LinkAnalysisService.execute({ url });
+      const result = await LinkAnalysisService.execute({ url: req.body.url });
     
     console.log("resultado controller: ", result);
     

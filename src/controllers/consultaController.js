@@ -1,43 +1,64 @@
-// import ConsultaService from "../services/consultaService.js";
-// import ConsultaRepository from "../repositories/ConsultaRepository.js";
+import ConsultaService from "../services/consultaService.js";
+import ConsultaRepository from "../repositories/ConsultaRepository.js";
 
-// class ConsultaController {
+class ConsultaController {
+  
+  analisarLink = async (req, res) => {
+    console.log("chegou no controller")
+    try {
+      const { url } = req.body;
+      
+      // LOG DE DEPURAÇÃO: Verifique se o ID está chegando aqui
+      console.log("ID do usuário no Controller:", req.user?.id);
 
-//   async criar(req, res) {
-//     try {
-//       const { user_id, tipo_consulta, conteudo } = req.body;
+      if (!url) {
+        return res.status(400).json({ error: "A URL é obrigatória para análise." });
+      }
 
-//       const consulta = await ConsultaService.criarConsulta({
-//         user_id,
-//         tipo_consulta,
-//         conteudo
-//       });
+      // O service.criarConsulta DEVE conter o await para garantir a inserção
+      const resultado = await ConsultaService.criarConsulta({
+        user_id: req.user.id, 
+        tipo_consulta: 'LINK',
+        conteudo: url
+      });
 
-//       return res.status(201).json(consulta);
-//     } catch (error) {
-//       console.log("passou por aqui");
-//       console.error("Erro ao criar consulta:", error);
-//       return res.status(400).json({ error: error.message });
-//     }
-//   }
+      // Se o service retornar erro ou score nulo, trate aqui
+      return res.json({
+        score: resultado.score,
+        classificacao: resultado.nivel,
+        conclusao: resultado.score >= 60 
+          ? "Atenção! Este link apresenta alto risco de fraude." 
+          : "Este link parece seguro para navegação."
+      });
 
-//   async listar(req, res) {
-//     try {
-//       const { user_id } = req.query;
+    } catch (error) {
+      console.error("Erro ao processar análise no Controller:", error);
+      return res.status(400).json({ error: error.message });
+    }
+  }
 
-//       if (!user_id) {
-//         return res.status(400).json({ error: "user_id é obrigatório" });
-//       }
+ async obterHistorico(req, res) {
+  try {
+    const user_id = req.user.id;
+    const consultas = await ConsultaRepository.findAllByUser(user_id);
+    
+    console.log("id do utilizador: ", user_id);
+    console.log("tipo do id: ", typeof req.user.id);
+    // O Dashboard.js geralmente procura por: data, alvo, resultado
+    const historicoFormatado = consultas.map(c => ({
+      // Use o nome exato da coluna do seu banco (data_consulta)
+      data: c.data_consulta ? new Date(c.data_consulta).toLocaleDateString('pt-BR') : 'N/A',
+      alvo: c.tipo_consulta || 'LINK', 
+      resultado: c.resultado || 'Indefinido'
+    }));
 
-//       const consultas = await ConsultaRepository.findAllByUser(user_id);
+    console.log("Enviando histórico formatado:", historicoFormatado);
+    return res.json(historicoFormatado);
+  } catch (error) {
+    console.error("Erro no Controller ao buscar histórico:", error);
+    return res.status(500).json({ error: "Erro interno" });
+  }
+}
+}
 
-//       return res.status(200).json(consultas);
-
-//     } catch (error) {
-//       console.log("erro aqui no controller");
-//       return res.status(500).json({ error: error.message });
-//     }
-//   }
-// }
-
-// export default new ConsultaController();
+export default new ConsultaController();

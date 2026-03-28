@@ -1,108 +1,65 @@
-// 1 - normalizar texto
-// 2 - detectar fatores psicologicos 
-// 3 - detectar padroes classicos 
-// 4 - detectar combinações criticas
-// 5 - classificar 
-// 6 - gerar resposta humana
-
-//upload de imagen
-
-// ocr - extrair o texto
-
-//motor de analise psicologica
-
-//score + classificação + resposta
-
-//tesseract.js - biblioteca
-
 class PrintFraudEngine {
-  analyze(text){
-    
-     const normalized = text.toLowerCase();
-     
-     let score = 0;
-     const maxScore = 200;
-     const fatoresDetectados = [];
-    const combinacao = 50;
-    //fatores psicologicos 
-    
-    //urgencia 
-    //dinheiro
-    //banco 
-    //codigo
-    
-    if(this.containsUrgency(normalized)){
-      score += 25;
-      fatoresDetectados.push("Urgencia: ", score);
-    }
-    
-    if(this.containsMoneyRequest(normalized)){
-      score += 50;
-      fatoresDetectados.push("pedido de dinheiro: ", score);
-    }
-    
-    if(this.containsCodeRequest(normalized)){
-      score += 60;
-      fatoresDetectados.push("pedido de código: ", score);
-    }
-    if(this.containsBankImpersonation(normalized)){
-        score += 60;
-        fatoresDetectados.push("se passando por banco: ", score);
+  analyze(text) {
+    const cleanText = (text || "").toString().toLowerCase();
+    let score = 0;
+    let fatoresDetectados = [];
+
+    const dicionario = [
+      { termo: 'urgente', peso: 40, label: 'urgencia' },
+      { termo: 'agora', peso: 30, label: 'urgencia' },
+      { termo: 'pix', peso: 50, label: 'dinheiro' },
+      { termo: 'código', peso: 60, label: 'codigo' },
+      { termo: 'banco', peso: 30, label: 'banco' }
+    ];
+
+    dicionario.forEach(item => {
+      if (cleanText.includes(item.termo)) {
+        score += item.peso;
+        if (!fatoresDetectados.includes(item.label)) {
+          fatoresDetectados.push(item.label);
+        }
       }
-      
-    //combinações
-    //combinação +50 
-    // score + 50(combinação)
-    if(this.containsUrgency(normalized) && this.containsMoneyRequest(normalized)){
-      score += 50;
-      score +=combinacao;
-      
-      fatoresDetectados.push("combinação critica: urgencia + dinheiro", score);
+    });
+
+    if (this.containsBankImpersonation(cleanText)) score += 20;
+
+    let classificacaoFinal = score >= 100 ? "Golpe" : (score >= 50 ? "Suspeito" : "Seguro");
+
+    // REFORÇO NA DETECÇÃO DE COMPROVANTE
+    const termosComprovante = ["comprovante", "comprovante de", "transação"];
+    const termosSucesso = ["realizado", "pago", "sucesso", "concluída"];
+
+    const ehComprovante = termosComprovante.some(t => cleanText.includes(t)) && 
+                          termosSucesso.some(s => cleanText.includes(s));
+
+    if (ehComprovante) {
+      classificacaoFinal = "Comprovante Detectado";
+      score = 0; // Zeramos o risco pois é um documento, não uma abordagem
     }
-    
-    if(this.containsCodeRequest(normalized) && this.containsBankImpersonation(normalized)){
-      score += 60;
-      score+=combinacao;
-      fatoresDetectados.push("combinação critica: código + banco", score);
-    }
-    
-    //classificação
-    
-    let classificacao = "";
-    
-    if(score >= 150){
-      classificacao = "Golpe";
-    } else if (score >= 80) {
-      classificacao = "Suspeito";
-    } else if (score < 80 ){
-      classificacao = "Seguro";
-    }
+
     return {
       score,
-      maxScore,
-      classificacao,
+      classificacao: classificacaoFinal,
       fatoresDetectados
     };
   }
-  
-  //urgencia 
-  containsUrgency(text){
+  // --- Funções Auxiliares (Fora do analyze, mas dentro da classe) ---
+
+  containsUrgency(text) {
     return text.includes("urgente") || text.includes("agora") || text.includes("imediatamente");
   }
-  //dinheiro
-  containsMoneyRequest(text){
-    return text.includes("pix") || text.includes("transferẽncia")  || text.includes("manda dinheiro");
+
+  containsMoneyRequest(text) {
+    return text.includes("pix") || text.includes("transferência") || text.includes("manda dinheiro");
   }
-  // codigo de verificacao
-  containsCodeRequest(text){
-    return text.includes("código") || text.includes("código de verificação");
+
+  containsCodeRequest(text) {
+    return text.includes("código") || text.includes("verificação");
   }
-  //banco
-  containsBankImpersonation(text){
-    return text.includes("sou do banco") || text.includes("central do banco")
-      || text.includes("senha do banco")
-      || text.includes("banco") 
-      || text.includes("código do banco");
+
+  containsBankImpersonation(text) {
+    const termosBanco = ["sou do banco", "central do banco", "senha do banco", "código do banco"];
+    return termosBanco.some(termo => text.includes(termo));
   }
 }
 

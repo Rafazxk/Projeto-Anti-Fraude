@@ -1,13 +1,11 @@
-import Tesseract from "tesseract.js";
+// Exemplo de utils/ocr.js
+import Tesseract from 'tesseract.js';
 
-export async function extractTextFromImage(image_path){
-  
-  const result = await Tesseract.recognize(
-    image_path,
-    "por",
-     {
-      logger: m => console.log(m)
-     }
-    );
-  return result.data.text;
-}
+export const extractTextFromImage = async (imagePath) => {
+  try {
+    const { data: { text } } = await Tesseract.recognize(imagePath, 'por'); // 'por' para português
+    return text;
+  } catch (error) {
+    throw new Error("Falha ao processar OCR: " + error.message);
+  }
+};

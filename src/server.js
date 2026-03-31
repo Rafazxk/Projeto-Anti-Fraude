@@ -1,7 +1,15 @@
-import app from "./app.js";
+import pkg from 'pg';
+const { Pool } = pkg;
 
-const PORT = 3000;
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
+
+pool.on('connect', () => {
+  console.log('--- [BANCO] Conectado ao PostgreSQL no Render ---');
+});
+
+export default pool;

@@ -15,10 +15,10 @@ export default function authMiddleware(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, SECRET);
-    req.user = decoded; 
-    console.log("2. Token válido! Chamando next()...");
+    req.user = { id: decoded.id || decoded.user_id }; 
+    console.log("Middleware: token ok - id:", req.user.id);
     
-    next(); // <--- SE ESSA LINHA NÃO FOR EXECUTADA, O CONTROLLER NUNCA ABRE
+    next(); 
     
   } catch (err) {
     console.log("Erro no JWT:", err.message);

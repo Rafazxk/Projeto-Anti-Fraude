@@ -1,16 +1,15 @@
-import express from 'express';
-import ConsultaController from '../controllers/consultaController.js';
+import { Router } from 'express';
+import ConsultaController from '../controllers/ConsultaController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import upload from '../middleware/upload.js'; // Para o print
 
-const router = express.Router();
-
-// Teste manual: Se o middleware passar, este log TEM que aparecer
-router.post('/link', (req, res, next) => {
-    console.log("3. foi acionada sem middleware!");
-    next();
-}, ConsultaController.analisarLink);
+const router = Router();
 
 
+router.post('/link', authMiddleware, ConsultaController.analisarLink);
+router.post('/phone', authMiddleware, ConsultaController.analisarTelefone);
 router.get('/historico', authMiddleware, ConsultaController.obterHistorico);
+
+router.post('/print', authMiddleware, upload.single('imagem'), ConsultaController.analisarPrint);
 
 export default router;

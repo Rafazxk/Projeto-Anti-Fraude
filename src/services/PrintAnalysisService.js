@@ -5,88 +5,64 @@ import PrintFraudEngine from "../domain/engines/PrintFraudEngine.js";
 import PrintRepository from "../repositories/PrintRepository.js";
 
 class PrintAnalysisService {
-  async execute({ image_path, userId }) {
-
+  async execute({ image_path }) { // Removido user_id daqui, o Controller cuida disso
     if (!image_path) {
       throw new Error("A imagem é obrigatória.");
     }
-  
-   console.log("image_path", image_path);
-   
+
     try {
-      // 1. Gerar Hash da imagem para busca rápida e cache
+      // 1. Gerar Hash para evitar reprocessar a mesma imagem (Economiza OCR)
       const imageBuffer = fs.readFileSync(image_path);
       const id_hash = crypto.createHash('sha256').update(imageBuffer).digest('hex');
 
-      // 2. Tentar buscar se esta imagem já foi analisada antes
+      // 2. Verificar se já analisamos essa imagem antes
       const analiseExistente = await PrintRepository.findByHash(id_hash);
       
       if (analiseExistente) {
-        // Se já existe, apenas vinculamos a consulta ao usuário atual (se houver userId)
-        if (userId) await PrintRepository.registrarNovaConsultaParaHash(id_hash, userId);
-        
-        // Mapeamos os nomes do banco (score_risco) para o formato do Front (score)
+        console.log("--- [SERVICE] Imagem já conhecida, retornando cache ---");
         return this.formatResponse({
           score: analiseExistente.score_risco,
           classificacao: analiseExistente.tipo_golpe,
-          fatores: [] // Como o banco atual não salva fatores separadamente, passamos vazio ou tratamos
+          fatores: []
         }, id_hash);
       }
 
-      // 3. Processo de análise nova (OCR + Engine)
+      // 3. OCR - Extração de texto (Onde deu o log do "Olá, Boa tarde")
       const text = await extractTextFromImage(image_path);
-      
       console.log("debug - texto extraído do print:", text);
       
-      // const text = "URGENTE PIX AGORA BLOQUEIO BANCO";
-      
+      // 4. Engine de Fraude - Inteligência
       const result = PrintFraudEngine.analyze(text);
 
-      // 4. Fluxo de Banco de Dados seguindo seu Schema
-      // Primeiro, criamos a entrada na tabela 'consultas' para obter o ID necessário
-      const consulta_id = await PrintRepository.criarConsulta('0586eae6-c976-4d1a-85ac-a2c9339bc763');
-
-      // Segundo, salvamos na 'prints_analisados' usando suas colunas exatas
-      const novaAnaliseDB = {
-        id_hash,
-        consulta_id,
-        caminho_arquivo: image_path,
-        texto_extraido: text,
-        tipo_golpe: result.classificacao, // 'Golpe', 'Suspeito', 'Seguro'
-        score_risco: result.score
-      };
-
-      await PrintRepository.save(novaAnaliseDB);
-
-      // 5. Retorno Padronizado
+      // 5. Retornar apenas os dados processados
+      // O Controller se encarregará de chamar PrintRepository.save() e ConsultaRepository.create()
       return this.formatResponse({
         score: result.score,
         classificacao: result.classificacao,
-        fatores: result.fatoresDetectados
+        fatores: result.fatoresDetectados,
+        texto_extraido: text // Adicionado para o Controller poder salvar
       }, id_hash);
 
     } catch (error) {
       console.error("[PrintService Error]:", error);
-      throw new Error("Erro ao processar imagem no banco de dados.");
+      throw new Error("Erro ao processar inteligência da imagem.");
     }
   }
 
   formatResponse(dados, id_hash) {
-    const { score, classificacao, fatores } = dados;
+    const { score, classificacao, fatores, texto_extraido } = dados;
 
     const alertasHumanos = (fatores || []).map(f => {
       const termo = f.toString().toLowerCase();
       if (termo.includes("urgencia")) return "Pressão psicológica para agir rápido.";
       if (termo.includes("dinheiro") || termo.includes("pix")) return "Solicitação de transferência de valores.";
-      if (termo.includes("código")) return "Pedido suspeito de códigos de segurança.";
-      if (termo.includes("banco")) return "Tentativa de se passar por uma instituição financeira.";
-      if (termo.includes("critica")) return "Combinação de alto risco detectada.";
-      return "Padrão de conversa suspeito detectado.";
+      if (termo.includes("banco")) return "Tentativa de se passar por instituição financeira.";
+      return "Padrão suspeito detectado.";
     });
 
     return {
       id_hash,
-      status: "Análise Concluída",
+      texto_extraido, // Passando adiante para o Controller salvar no banco
       score: Number(score),
       classificacao: classificacao,
       alertas: [...new Set(alertasHumanos)],
@@ -95,17 +71,11 @@ class PrintAnalysisService {
   }
 
   buildConclusion(score, classificacao) {
-  if (classificacao === "Comprovante Detectado") {
-    return "ocumento de transação identificado. Certifique-se de que o valor caiu na sua conta antes de entregar qualquer produto.";
+    if (classificacao === "Comprovante Detectado") return "Documento de transação identificado. Verifique seu saldo.";
+    if (classificacao === "Golpe" || score >= 100) return "BLOQUEIE O CONTATO. Identificamos padrões claros de golpe.";
+    if (classificacao === "Suspeito" || score >= 50) return "ATENÇÃO: Elementos suspeitos detectados. Não forneça dados.";
+    return "Não detectamos riscos imediatos nesta imagem.";
   }
-  if (classificacao === "Golpe" || score >= 100) {
-    return "LOQUEIE O CONTATO. Identificamos padrões claros de golpe financeiro nesta imagem.";
-  }
-  if (classificacao === "Suspeito" || score >= 50) {
-    return "ATENÇÃO: Esta conversa possui elementos suspeitos. Não forneça dados ou códigos.";
-  }
-  return "✅ão detectamos riscos imediatos nesta imagem.";
-}
 }
 
 export default new PrintAnalysisService();

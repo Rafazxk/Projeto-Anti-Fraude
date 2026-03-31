@@ -2,8 +2,6 @@ import jwt from "jsonwebtoken";
 import UserRepository from "../repositories/UserRepository.js";
 import bcrypt from "bcryptjs";
 
-const SECRET = "dsadjsadj";
-
 class UserService {
   async register({ email, senha, tipo_pessoa }) {
     const userExists = await UserRepository.findByEmail(email);
@@ -40,7 +38,7 @@ class UserService {
    
    const token = jwt.sign(
      { user_id: user.user_id },
-     SECRET, 
+     token: process.env.JWT_SECRET, 
      { expiresIn: "1d" }
      );
 

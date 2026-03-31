@@ -4,95 +4,73 @@ import ScoreCalculator from "../domain/scoring/ScoreCalculator.js";
 import RiskClassifier from "../domain/classification/RiskClassifier.js";
 import BlacklistRepository from "../repositories/BlacklistRepository.js";
 import ConsultaRepository from "../repositories/ConsultaRepository.js";
-import ConsultaDetalhesRepository from "../repositories/ConsultaDetalhesRepository.js";
 import Logger from "../utils/logger.js";
 
 class ConsultaService {
 
   async criarConsulta({ user_id, tipo_consulta, conteudo }) {
-
-    Logger.info("ConsultaService", "Iniciando criação de consulta");
-
-    const dominio = this.extrairDominio(conteudo);
-
-    if (!dominio) {
-      return {
-        score: 0,
-        nivel: "URL inválida"
-      };
-    }
-
-    console.log("DOMINIO EXTRAIDO:", dominio);
-
+    console.log("--- [SERVICE] PASSO 1: Entrou na função ---");
     
-    const regras = [
-      new CheckBlacklist(BlacklistRepository),
-      new CheckDomainStructure()
-    ];
+    try {
+      const dominio = this.extrairDominio(conteudo);
+      console.log("--- [SERVICE] PASSO 2: Domínio extraído:", dominio);
 
-    const regrasAtivadas = [];
-
-    for (const regra of regras) {
-      const resultado = await regra.execute(dominio);
-      if (resultado) {
-        regrasAtivadas.push(resultado);
+      if (!dominio) {
+        return { score: 0, nivel: "URL inválida" };
       }
-    }
-    
-    console.log("regras ativadas: ", regrasAtivadas);
-    
-    const scoreCalculator = new ScoreCalculator();
-    const score = scoreCalculator.execute(regrasAtivadas);
 
-    const riskClassifier = new RiskClassifier();
-    const nivel = riskClassifier.execute(score);
+      // 1. Executar Regras
+      const regras = [
+        new CheckBlacklist(BlacklistRepository),
+        new CheckDomainStructure()
+      ];
 
-    const consulta = await ConsultaRepository.create({
-      user_id,
-      tipo_consulta,
-      score_risco: score,
-      resultado: nivel
-    });
+      const regrasAtivadas = [];
+      for (const regra of regras) {
+        const resultadoRegra = await regra.execute(dominio);
+        if (resultadoRegra) {
+          regrasAtivadas.push(resultadoRegra);
+        }
+      }
+      console.log("--- [SERVICE] PASSO 3: Regras processadas ---");
 
-    for (const detalhe of regrasAtivadas) {
-      await ConsultaDetalhesRepository.salvarDetalhe({
-        consulta_id: consulta.consulta_id,
-        regra_ativada: detalhe.regra,
-        pontuacao: detalhe.pontuacao,
-        mensagem: detalhe.mensagem
+      // 2. Calcular Score
+      const scoreCalc = new ScoreCalculator();
+      const score = scoreCalc.execute(regrasAtivadas);
+      console.log("--- [SERVICE] PASSO 4: Score obtido:", score);
+
+      // 3. Classificar Risco
+      const riskClass = new RiskClassifier();
+      const nivel = riskClass.execute(score);
+      console.log("--- [SERVICE] PASSO 5: Nível classificado:", nivel);
+
+      // 4. Salvar no Banco
+      console.log("--- [SERVICE] PASSO 6: Tentando salvar no Repository ---");
+      const consulta = await ConsultaRepository.create({
+        user_id,
+        tipo_consulta,
+        score_risco: score,
+        resultado: nivel
       });
+
+      console.log("--- [SERVICE] PASSO 7: Sucesso total! ID:", consulta?.id);
+
+      return { score, nivel };
+
+    } catch (error) {
+      console.error("--- [SERVICE] ERRO FATAL DENTRO DO SERVICE ---");
+      console.error("Mensagem:", error.message);
+      console.error("Stack:", error.stack);
+      throw error; // Repassa para o Controller ver
     }
-
-    Logger.info("ConsultaService", `Consulta salva com ID ${consulta.consulta_id}`);
-
-    return {
-      score,
-      nivel
-    };
   }
 
   extrairDominio(url) {
     try {
-      if (!url || typeof url !== "string") return null;
-
-      const urlLimpa = url.trim();
-
-      const urlFormatada = urlLimpa.startsWith("http")
-        ? urlLimpa
-        : `http://${urlLimpa}`;
-
-      const parsedUrl = new URL(urlFormatada);
-
-      let hostname = parsedUrl.hostname
-        .toLowerCase()
-        .replace(/^www\./, "")
-        .trim();
-
-      hostname = hostname.split(":")[0];
-      hostname = hostname.replace(/\.$/, "");
-
-      return hostname || null;
-
+      if (!url) return null;
+      const urlFormatada = url.includes("://") ? url : `http://${url}`;
+      const parsed = new URL(urlFormatada);
+      return parsed.hostname.replace(/^www\./, "");
     } catch {
       return null;
     }

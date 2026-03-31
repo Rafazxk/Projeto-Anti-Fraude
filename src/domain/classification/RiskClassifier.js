@@ -1,7 +1,8 @@
 class RiskClassifier {
   execute(score) {
-    if (score <= 30) return "Seguro";
-    if (score <= 60) return "Suspeito";
+    console.log("calculando classificação para score: ", score);
+    if(score >= 80) return "Alto risco";
+    if (score >= 50) return "Médio risco";
     return "Golpe";
   }
 }

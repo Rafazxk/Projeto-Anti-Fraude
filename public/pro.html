@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardix Pro | Painel de Controle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/pro.css">
+</head>
+<body class="pro-theme">
+
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-shield-check"></i>
+                    <span>GUARDIX <strong>PRO</strong></span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" onclick="navegar(event, 'verificador')">
+                    <i class="fas fa-house"></i> Início
+                </a>
+                <a href="#" class="nav-link" onclick="navegar(event, 'seguranca')">
+                    <i class="fas fa-chart-pie"></i> Central de Segurança
+                </a>
+                <a href="#" class="nav-link" onclick="navegar(event, 'historico')">
+                    <i class="fas fa-list-check"></i> Histórico de Proteção
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="avatar">JS</div>
+                    <div class="user-details">
+                        <p class="u-name">João Silva</p>
+                        <span class="u-plan">Plano Vitalício</span>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+        </aside>
+
+        <!-- Área Principal -->
+        <main class="main-content">
+            
+            <!-- Seção 1: Verificador IA (Tela Inicial) -->
+            <section id="secao-verificador" class="content-section">
+                <div class="welcome-header">
+                    <h1>Olá, João! 👋</h1>
+                    <p>O que deseja verificar hoje?</p>
+                </div>
+
+                <div class="glass-card">
+                    <form id="form-analise-pro">
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label>Link Suspeito</label>
+                                <input type="text" id="input-url" placeholder="https://...">
+                            </div>
+                            <div class="input-group">
+                                <label>Telefone</label>
+                                <input type="text" id="input-tel" placeholder="(00) 00000-0000">
+                            </div>
+                        </div>
+
+                        <div class="upload-box" id="drop-zone">
+                            <input type="file" id="arquivo-print" hidden>
+                            <label for="arquivo-print">
+                                <i class="fas fa-file-invoice"></i>
+                                <span>Analisar Print ou Comprovante</span>
+                                <small id="nome-doc">Arraste o arquivo aqui</small>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-scan">
+                            <i class="fas fa-microchip"></i> INICIAR ANÁLISE COM IA
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Seção 2: Central de Segurança -->
+            <section id="secao-seguranca" class="content-section" style="display:none;">
+                <div class="welcome-header">
+                    <h1>Sua Saúde Digital</h1>
+                    <p>Resumo de proteção dos últimos 30 dias.</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><h3>12</h3><p>Ameaças Bloqueadas</p></div>
+                    <div class="stat-item"><h3>98%</h3><p>Nível de Proteção</p></div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Botão Flutuante do Chatbot -->
+        <div class="chat-wrapper">
+            <button class="chat-trigger" onclick="toggleChat()">
+                <i class="fas fa-comment-dots"></i>
+            </button>
+            <div class="chat-box" id="chat-window">
+                <div class="chat-header">
+                    <span>Suporte IA Guardix</span>
+                    <i class="fas fa-times" onclick="toggleChat()"></i>
+                </div>
+                <div class="chat-body" id="chat-messages">
+                    <div class="msg ai">Olá! Como posso te ajudar agora?</div>
+                </div>
+                <div class="chat-footer">
+                    <input type="text" placeholder="Digite sua dúvida...">
+                    <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/pro_dashboard.js"></script>
+</body>
+</html>

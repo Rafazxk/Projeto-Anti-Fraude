@@ -3,61 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Guardix - Plano Free</title>
+    <title>Guardix | Dashboard Profissional</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/dash.css">
 </head>
 <body class="corpo-dashboard">
  
-    <button class="botao-menu-mobile" onclick="alternarMenu()">☰</button>
- 
+    <button class="botao-menu-mobile" onclick="alternarMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <aside class="barra-lateral" id="sidebar">
-        <div class="fechar-menu-mobile" onclick="alternarMenu()">✕</div>
-        <div class="logo-painel">Guardix</div>
-        <nav class="menu-interno">
-            <a href="#" class="item-menu ativo" onclick="navegar(event, 'verificador')">🔍 Verificador</a>
-            <a href="#" class="item-menu" onclick="navegar(event, 'historico')">🕒 Histórico</a>
-            <a href="#" class="item-menu" onclick="navegar(event, 'dicas')">🛡️ Dicas</a>
-            <a href="#" class="item-menu destaque-upgrade" onclick="navegar(event, 'pro')">🚀 Virar Pro</a>
-        </nav>
-        <div class="perfil-usuario">
-            <div class="avatar">JS</div>
-            <div class="info-user">
-                <p class="nome">João Silva</p>
-                <span class="badge-plano">Plano Free</span>
+        <div class="sidebar-top">
+            <div class="fechar-menu-mobile" onclick="alternarMenu()"><i class="fas fa-times"></i></div>
+            <div class="logo-painel">
+                <i class="fas fa-shield-halved"></i> Guardix
             </div>
+            
+            <nav class="menu-interno">
+                <a href="#" class="item-menu ativo" onclick="navegar(event, 'verificador')">
+                    <i class="fas fa-magnifying-glass"></i> Verificador
+                </a>
+                <a href="#" class="item-menu" onclick="navegar(event, 'historico')">
+                    <i class="fas fa-clock-rotate-left"></i> Histórico
+                </a>
+                <a href="#" class="item-menu" onclick="navegar(event, 'dicas')">
+                    <i class="fas fa-lightbulb"></i> Dicas
+                </a>
+                <a href="#" class="item-menu destaque-upgrade" onclick="navegar(event, 'pro')">
+                    <i class="fas fa-rocket"></i> Virar Pro
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="perfil-usuario">
+                <div class="avatar">JS</div>
+                <div class="info-user">
+                    <p class="nome">João Silva</p>
+                    <span class="badge-plano">Plano Free</span>
+                </div>
+            </div>
+            <button id="btn-logout" class="logout-link" onclick="logout()">
+                <i class="fas fa-right-from-bracket"></i> Sair da conta
+            </button>
         </div>
     </aside>
- 
+
     <main class="conteudo-painel">
         <!-- Seção: Verificador -->
         <section id="secao-verificador" class="secao-conteudo">
             <header class="topo-painel">
-                <h1>Verificador</h1>
+                <div class="titulo-pagina">
+                    <h1>Verificador</h1>
+                    <p>Analise ameaças em segundos</p>
+                </div>
                 <div class="status-cota">
-                    <span>Cota Diária: <strong id="contagem-cota">0</strong>/5 consultas</span>
-                    <div class="barra-progresso"><div id="progresso-cota" class="preenchimento" style="width: 0%;"></div></div>
+                    <div class="cota-info">
+                        <span>Cota Diária</span>
+                        <strong id="contagem-cota">0/5</strong>
+                    </div>
+                    <div class="barra-progresso">
+                        <div id="progresso-cota" class="preenchimento" style="width: 0%;"></div>
+                    </div>
                 </div>
             </header>
+
             <div class="cartao-ferramenta">
                 <form id="form-analise-interna" class="formulario-interno">
-                    <div class="grupo-input">
-                        <label>Link Suspeito</label>
-                        <input type="url" id="input-url" placeholder="https://site-duvidoso.com">
+                    <div class="grid-inputs">
+                        <div class="grupo-input">
+                            <label><i class="fas fa-link"></i> Link Suspeito</label>
+                            <input type="url" id="input-url" placeholder="https://site-duvidoso.com">
+                        </div>
+                        <div class="grupo-input">
+                            <label><i class="fas fa-phone"></i> Telefone ou WhatsApp</label>
+                            <input type="tel" id="input-tel" placeholder="(00) 00000-0000">
+                        </div>
                     </div>
-                    <div class="grupo-input">
-                        <label>Telefone ou WhatsApp</label>
-                        <input type="tel" id="input-tel" placeholder="(00) 00000-0000">
-                    </div>
+
                     <div class="upload-area">
                         <input type="file" id="arquivo-print" hidden accept="image/*">
                         <label for="arquivo-print">
-                            <span class="icone-upload">📸</span>
-                            <p>Anexar <strong>Print do Comprovante</strong></p>
-                            <span id="nome-doc">Nenhum arquivo...</span>
+                            <div class="icone-upload"><i class="fas fa-cloud-arrow-up"></i></div>
+                            <p>Arraste ou clique para anexar <strong>Print do Comprovante</strong></p>
+                            <span id="nome-doc">Nenhum arquivo selecionado</span>
                         </label>
                     </div>
-                    <button type="submit" id="btn-analisar" class="botao-executar">Verificar Agora</button>
+
+                    <button type="submit" id="btn-analisar" class="botao-executar">
+                        <i class="fas fa-shield-check"></i> Verificar Agora
+                    </button>
                 </form>
+
                 <div id="resultado-analise" class="resultado-box" style="display: none;">
                     <div class="loading-container">
                         <div class="spinner"></div>
@@ -70,14 +110,17 @@
 
         <!-- Seção: Histórico -->
         <section id="secao-historico" class="secao-conteudo" style="display: none;">
-            <h1>🕒 Histórico de Consultas</h1>
+            <div class="titulo-pagina">
+                <h1>Histórico de Consultas</h1>
+                <p>Registros de suas últimas análises</p>
+            </div>
             <div class="tabela-container">
                 <table class="tabela-historico">
                     <thead>
                         <tr>
                             <th>Data</th>
                             <th>Alvo</th>
-                            <th>Resultado</th>
+                            <th>Status de Risco</th>
                         </tr>
                     </thead>
                     <tbody id="lista-historico">
@@ -89,23 +132,45 @@
 
         <!-- Seção: Dicas -->
         <section id="secao-dicas" class="secao-conteudo" style="display: none;">
-            <h1>🛡️ Dicas de Segurança</h1>
+            <div class="titulo-pagina">
+                <h1>Dicas de Segurança</h1>
+                <p>Proteja-se contra os golpes mais comuns</p>
+            </div>
             <div class="grade-dicas">
-                <div class="card-dica"><h3>Verifique a URL</h3><p>Sempre olhe se o domínio termina em .com.br oficial.</p></div>
-                <div class="card-dica"><h3>Cuidado com Urgência</h3><p>Golsitas usam frases como "Sua conta será bloqueada hoje".</p></div>
-                <div class="card-dica"><h3>Prints de PIX</h3><p>Confira sempre no extrato do banco, nunca apenas pelo print.</p></div>
+                <div class="card-dica">
+                    <div class="dica-icon"><i class="fas fa-globe"></i></div>
+                    <h3>Verifique a URL</h3>
+                    <p>Sempre olhe se o domínio termina em .com.br oficial e possui o cadeado de segurança.</p>
+                </div>
+                <div class="card-dica">
+                    <div class="dica-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Cuidado com Urgência</h3>
+                    <p>Golpistas usam pressão psicológica como "Sua conta será bloqueada em 30 minutos".</p>
+                </div>
+                <div class="card-dica">
+                    <div class="dica-icon"><i class="fas fa-receipt"></i></div>
+                    <h3>Prints de PIX</h3>
+                    <p>Confira sempre o saldo no extrato do seu banco. Prints podem ser facilmente editados.</p>
+                </div>
             </div>
         </section>
 
         <!-- Seção: Virar Pro -->
         <section id="secao-pro" class="secao-conteudo" style="display: none;">
             <div class="card-upgrade">
-                <h2>Acesse o Poder Total 🚀</h2>
-                <p>Consultas ilimitadas, análise de IA avançada e suporte 24h.</p>
-                <button class="botao-executar">Assinar Agora - R$ 29,90</button>
+                <div class="badge-pro-floating">PRO</div>
+                <h2>Acesse o Poder Total <i class="fas fa-crown"></i></h2>
+                <p>Análises ilimitadas com inteligência artificial de última geração.</p>
+                <div class="beneficios-pro">
+                    <span><i class="fas fa-check"></i> Sem limites diários</span>
+                    <span><i class="fas fa-check"></i> Suporte prioritário 24/7</span>
+                    <span><i class="fas fa-check"></i> Detecção de Deepfake</span>
+                </div>
+                <button class="botao-upgrade-final">Assinar Agora - R$ 29,90</button>
             </div>
         </section>
     </main>
+
     <script src="js/dashboard.js"></script>
 </body>
 </html>

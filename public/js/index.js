@@ -1,7 +1,7 @@
 // --- CONFIGURAÇÕES ---
-const URL_API = "http://localhost:3000";
+const URL_API = "https://projeto-anti-fraude.onrender.com";
 
-// --- LÓGICA DE INTERFACE (MODAL) ---
+// --- LÓGICA DE INTERFACE ---
 function abrirModal() {
     document.getElementById('modal-autenticacao').style.display = 'flex';
 }
@@ -34,15 +34,15 @@ window.onclick = function(event) {
     if (event.target == modal) fecharModal();
 }
 
-// Exibir nome do arquivo selecionado
+
 document.getElementById('print').addEventListener('change', function() {
     const nomeArquivo = this.files[0] ? this.files[0].name : "Nenhum arquivo selecionado";
     document.getElementById('nome-arquivo').textContent = "Arquivo selecionado: " + nomeArquivo;
 });
 
-// --- MÉTODOS DE AUTENTICAÇÃO REAIS ---
 
-// 1. LOGIN
+
+// LOGIN
 document.getElementById('formulario-login').onsubmit = async function(e) {
     e.preventDefault();
     
@@ -63,7 +63,6 @@ document.getElementById('formulario-login').onsubmit = async function(e) {
         const dados = await resposta.json();
 
         if (resposta.ok) {
-            // Salva o Token e o Nome vindo da sua API
             localStorage.setItem('guardix_token', dados.token);
             localStorage.setItem('usuario_nome', dados.nome || email.split('@')[0]);
             
@@ -116,7 +115,6 @@ document.getElementById('formulario-cadastro').onsubmit = async function(e) {
     }
 };
 
-// --- VERIFICADOR DA HOME (LÓGICA DE CHAMADA REAL) ---
 document.getElementById('formulario-analise').onsubmit = async function(e) {
     e.preventDefault();
     
@@ -131,7 +129,5 @@ document.getElementById('formulario-analise').onsubmit = async function(e) {
     const telValue = document.getElementById('telefone').value;
     const fileFile = document.getElementById('print').files[0];
 
-    // Se o usuário já está logado, enviamos para o dashboard com os parâmetros
-    // OU você pode processar aqui mesmo. Vamos redirecionar para manter a lógica do dashboard:
     window.location.href = "guardix.html";
 };

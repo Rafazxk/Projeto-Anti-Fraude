@@ -1,31 +1,16 @@
 import express from "express";
 import cors from "cors";
-
-import userRoutes from "./routes/userRoutes.js";
- import consultaRoutes from "./routes/consultaRoutes.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import userRoutes from "./routes/userRoutes.js";
+import consultaRoutes from "./routes/consultaRoutes.js";
+
+const app = express();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-console.log("Diretório atual:", __dirname);
-console.log("Tentando servir estáticos de:", path.join(__dirname, 'public'));
-
-app.use(express.static(path.join(__dirname, '../public')));
-
-
-app.get('*', (req, res, next) => {
-    // Ignora rotas que começam com /api
-    if (req.path.startsWith('/api')) return next();
-    
-    res.sendFile(path.join(__dirname, 'public', 'index.html'), (err) => {
-        if (err) {
-            console.error("Erro ao enviar index.html:", err);
-            res.status(404).send("Arquivo index.html não encontrado na pasta public.");
-        }
-    });
-});
+const publicPath = path.resolve(__dirname, '..', 'public');
 
 app.use(cors({
   origin: "*",
@@ -33,7 +18,33 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+app.use(express.json());
+
+app.use(express.static(publicPath));
+
+
+console.log("--- [GUARDX DEPLOY LOG] ---");
+console.log("Caminho da pasta Public:", publicPath);
+
+
 app.use("/users", userRoutes);
 app.use("/api", consultaRoutes);
+
+
+app.use((req, res, next) => {
+   
+    if (req.path.startsWith('/api') || req.path.startsWith('/users')) {
+        return res.status(404).json({ error: "Rota de API não encontrada." });
+    }
+
+   
+    const indexPath = path.join(publicPath, 'index.html');
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+           
+            res.status(404).send("Front-end não encontrado. Verifique a pasta public.");
+        }
+    });
+});
 
 export default app;

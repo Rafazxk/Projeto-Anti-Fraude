@@ -1,7 +1,7 @@
 import pkg from "pg";
 import dotenv from "dotenv";
 
-import { setupDatabase } from './config/initDb.js';
+import { setupDatabase } from './initDb.js';
 
 setupDatabase();
 dotenv.config();

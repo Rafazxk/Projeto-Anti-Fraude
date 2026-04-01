@@ -1,12 +1,6 @@
 # Usa uma imagem oficial do Node.js
 FROM node:18
 
-# Instala as dependências do sistema (Tesseract OCR e bibliotecas de imagem)
-RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    tesseract-ocr-por \
-    libtesseract-dev \
-    && apt-get clean
 
 # Define o diretório de trabalho
 WORKDIR /app

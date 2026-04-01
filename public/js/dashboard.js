@@ -3,7 +3,8 @@
  * Versão: 2.1 (Ajustes de Segurança e Renderização)
  */
 
-const API = "http://localhost:3000";
+const API = "https://projeto-anti-fraude.onrender.com";
+
 let consultasRealizadas = 0;
 const limiteCota = 5;
 

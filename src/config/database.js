@@ -1,9 +1,6 @@
 import pkg from "pg";
 import dotenv from "dotenv";
 
-import { setupDatabase } from './initDb.js';
-
-setupDatabase();
 dotenv.config();
 
 const { Pool } = pkg;
@@ -15,13 +12,12 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // ADICIONE ISSO AQUI:
   ssl: {
     rejectUnauthorized: false 
   }
 });
 
-// Teste de conexão com tratamento de erro melhorado
+
 try {
   const client = await pool.connect();
   console.log("--- [BANCO] Conexão estabelecida com sucesso no Render! ---");

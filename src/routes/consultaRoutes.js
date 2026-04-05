@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import ConsultaController from '../controllers/ConsultaController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
-import upload from '../middleware/upload.js'; // Para o print
+import upload from '../middleware/upload.js';
 
 const router = Router();
 

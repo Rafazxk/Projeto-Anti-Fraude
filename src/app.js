@@ -23,16 +23,15 @@ app.use(express.json());
 app.use(express.static(publicPath));
 
 
-console.log("--- [GUARDX DEPLOY LOG] ---");
-console.log("Caminho da pasta Public:", publicPath);
+console.log("[GUARDX DEPLOY LOG]");
 
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'guardix.html'));
+  res.sendFile(path.join(publicPath, 'guardix.html'));
   
 });
 
 app.get('/inicio-guardix', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(publicPath, 'index.html'));
   
 })
 

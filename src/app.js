@@ -26,6 +26,14 @@ app.use(express.static(publicPath));
 console.log("--- [GUARDX DEPLOY LOG] ---");
 console.log("Caminho da pasta Public:", publicPath);
 
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'guardix.html'));
+  
+});
+app.get('/inicio-guardix', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  
+})
 
 app.use("/users", userRoutes);
 app.use("/api", consultaRoutes);
@@ -37,6 +45,8 @@ app.use((req, res, next) => {
         return res.status(404).json({ error: "Rota de API não encontrada." });
     }
 
+   
+   
    
     const indexPath = path.join(publicPath, 'index.html');
     res.sendFile(indexPath, (err) => {

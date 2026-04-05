@@ -14,7 +14,7 @@ window.onload = function() {
     const nomeUsuario = localStorage.getItem('usuario_nome');
 
     if (!token) {
-        window.location.href = "index.html";
+        window.location.href = "/inicio-guardix";
         return;
     }
 

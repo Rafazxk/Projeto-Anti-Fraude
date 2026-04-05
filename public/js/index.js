@@ -92,7 +92,7 @@ document.getElementById('formulario-cadastro').onsubmit = async function(e) {
         botao.innerText = "Criando Conta...";
         botao.disabled = true;
 
-        const resposta = await fetch(`${URL_API}/users/register`, { // ou /api/cadastro conforme sua API
+        const resposta = await fetch(`${URL_API}/users/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome, email, senha })

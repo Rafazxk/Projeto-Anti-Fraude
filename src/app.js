@@ -30,6 +30,7 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'guardix.html'));
   
 });
+
 app.get('/inicio-guardix', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
   

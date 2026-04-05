@@ -1,287 +1,105 @@
-Antifraude API
+# Guardix: Engine Anti-Fraude 
 
-API backend desenvolvida em Node.js para análise antifraude baseada em regras, cálculo de score e classificação de risco.
+O **Guardix** é uma API Backend de alta performance desenvolvida em Node.js, focada em análise antifraude baseada em regras dinâmicas, cálculo de score e classificação de risco em tempo real.
 
-O sistema recebe uma consulta, executa regras de validação, calcula um score de risco e classifica o resultado.
+---
 
- -- Visão Geral --
+## Arquitetura do Projeto
+O sistema foi construído sob os princípios da **Clean Architecture**, garantindo total desacoplamento entre as regras de negócio e as ferramentas externas (banco de dados/HTTP).
 
-O sistema segue uma arquitetura modular inspirada em Clean Architecture, separando:
+### Divisão de Camadas:
+- **Controller (HTTP):** Interface de entrada. Responsável apenas por receber requisições e retornar respostas.
+- **Service (Aplicação):** Orquestrador do fluxo. Coordena a execução das regras, cálculo de score e persistência.
+- **Domain (Negócio):** O coração do sistema. Contém a lógica pura de análise, sem dependências externas.
+- **Repository (Infra):** Camada de comunicação exclusiva com o **PostgreSQL**.
 
-Camada HTTP (Controller)
+---
 
-Camada de Aplicação (Service)
-
-Domínio (Regras de negócio)
-
-Infraestrutura (Repositories / Banco)
-
-Utilitários
-
--- Arquitetura do Projeto --
-
+## Estrutura de Diretórios
+```bash
 src/
- ├── controllers/
- ├── services/
- ├── routes/ 
- ├── domain/
- |     ├── analysis
- │     ├── rules/
- │     ├── scoring/
- │     └── classification/
- ├── repositories/
- ├── config/
- ├── utils/
-  Camadas da Aplicação
-  Controller
+ ├── controllers/    # Handlers de requisição
+ ├── services/       # Orquestração de casos de uso
+ ├── routes/         # Definição de endpoints
+ ├── domain/         # Lógica pura (Rules, Scoring, Classification)
+ ├── repositories/   # Camada de dados (SQL)
+ ├── config/         # Variáveis e setups
+ └── utils/          # Helpers e utilitários
+```
+## Fluxo de Análise
+O motor de análise segue um pipeline rigoroso para garantir a integridade do score:
 
-Responsável por:
+1. Controller recebe a consulta.
 
-Receber requisições HTTP
+2. Service dispara as Rules (Regras de Negócio).
 
-Chamar o Service
+3. ScoreCalculator processa as pontuações acumuladas.
 
-Retornar resposta
+4. RiskClassifier define a categoria de risco.
 
-Não contém regra de negócio.
+5. Repository persiste a consulta e os detalhes no banco.
 
--- Service --
+6. Controller entrega o veredito ao cliente.
 
-Responsável por:
+## Tecnologias e Requisitos
+- Runtime: Node.js 18+
 
-Orquestrar execução das regras
+- Banco de Dados: PostgreSQL 14+
 
-Calcular score
+- Segurança: Lógica de Hash para proteção de dados sensíveis.
 
-Classificar risco
+### 1. Instalação
+Clone o repositório:
+```Bash
+git clone [https://github.com/Rafazxk/anti-fraude.git](https://github.com/Rafazxk/anti-fraude.git)
+```
 
-Salvar dados no banco
-
-Exemplo:
-ConsultaService.criarConsulta()
-
- Domain (Regras de Negócio)
-
-Contém:
-
-CheckBlacklist
-
-ScoreCalculator
-
-RiskClassifier
-
-Essa camada:
-
-NÃO acessa banco
-
-NÃO conhece HTTP
-
-executa lógica pura
-
-Exemplo de retorno de regra:
-
-{
-  regra: "CHECK_BLACKLIST",
-  pontuacao: 120,
-  mensagem: "Domínio presente na blacklist"
-}
-
- Repository
-
-Responsável por:
-
-Comunicação com PostgreSQL
-
-Execução de SQL
-
-Somente aqui existe acesso ao banco.
-
--- Fluxo da Consulta -- 
-
-Controller
-   ↓
-Service
-   ↓
-Executa Regras
-   ↓
-Calcula Score
-   ↓
-Classifica Risco
-   ↓
-Salva Consulta
-   ↓
-Salva Detalhes
-   ↓
-Retorna Resultado
-
- -- Requisitos --
-
-Node.js 18+
-
-PostgreSQL 14+
-
-Verificar versão:
-
-node -v
-
--- Instalação --
-
-1. Clonar o projeto
-
-git clone (https://github.com/Rafazxk/anti-fraude)
-
-cd antifraude
-
-2. Instalar dependências
-
+### 2. Instale as dependências:
+```Bash
 npm install
-
-3. Criar arquivo .env
-
+```
+### 3. Configure o arquivo .env:
+```bash
 PORT=3000
-DATABASE_URL=
-
-4. Rodar o servidor
-
+DATABASE_URL=seu_postgresql_url
+Inicie o servidor:
+```
+### inicie o servidor: 
+```Bash
 node src/server.js
+```
 
+## Modelagem de Dados (ERD)
+O sistema utiliza um esquema relacional otimizado para auditoria de fraudes:
 
- -- Estrutura do Banco de Dados --
+- Users: Gestão de planos e credenciais.
 
-Tabela: users
+- Consultas: Registro principal do veredito e score.
 
-user_id (UUID)
+- Consulta_Detalhes: Histórico detalhado de quais regras foram ativadas e por quê.
 
-email (UNIQUE)
-
-senha_hash
-
-plano
-
-data_criacao
-
-Tabela: consultas
-
-consulta_id
-
-user_id (FK)
-
-tipo_consulta
-
-score_risco
-
-resultado
-
-Tabela: consulta_detalhes
-
-id
-
-consulta_id (FK)
-
-regra_ativada
-
-pontuacao
-
-mensagem
-
-risco
-
-data_criacao
-
- -- Como Adicionar Nova Regra --
-
-1. Criar nova regra em:
-
-src/domain/rules/NovaRegra.js
-
-Estrutura padrão:
-
+## Expansibilidade: Adicionando Regras
+O sistema foi desenhado para ser extensível. Para adicionar uma nova regra, basta criar um novo arquivo em src/domain/rules/ seguindo o contrato padrão:
+```bash
+JavaScript
 class NovaRegra {
-  constructor(repository) {
-    this.repository = repository;
-  }
-
+  constructor(repository) { this.repository = repository; }
   async execute(dados) {
-    const resultado = await this.repository.buscar(dados);
-
-    if (!resultado) return null;
-
-    return {
-      regra: "NOVA_REGRA",
-      pontuacao: 50,
-      mensagem: "Descrição da regra"
-    };
+    // Lógica de verificação
+    return { regra: "NOME", pontuacao: 50, mensagem: "..." };
   }
 }
+```
 
-export default NovaRegra;
+## Road Map & Evoluções
+- [ ] Implementação de Autenticação via JWT.
 
-2. Instanciar no ConsultaService:
+- [ ] Motor de regras dinâmicas via Dashboard.
 
-const novaRegra = new NovaRegra(AlgumRepository);
-const resultado = await novaRegra.execute(conteudo);
+- [ ] Documentação interativa com Swagger.
 
-if (resultado) {
-  regrasAtivadas.push(resultado);
-}
+- [ ] Cobertura de testes unitários.
 
-Nunca altere:
-
-ScoreCalculator
-
-RiskClassifier
-
-Estrutura das camadas
-
-Apenas adicione novas regras.
-
--- Boas Práticas --
-
- Não colocar SQL no Domain
- Não colocar regra de negócio no Controller
- Não misturar nome de coluna com nome de regra
- Manter cada camada com responsabilidade única
-
--- Conceito Arquitetural --
-
-Domain → logica pura
-
-Service → coordenação
-
-Repository → banco
-
-Controller → HTTP
-
-Se algo novo for adicionado, sempre pergunte:
-
- # Isso é regra de negócio ou infraestrutura?
-
- -- Possíveis Evoluções Futuras --
-
-Motor automático de regras
-
-Sistema de múltiplas regras dinâmicas
-
-Autenticação JWT
-
-Logs estruturados
-
-Testes automatizados
-
-Swagger para documentação de API
-
-Deploy em ambiente cloud
-
-
- --Autor --
- 
-Desenvolvido por Rafael
-Projeto focado em aprendizado avançado de backend e arquitetura de sistemas.
-
-
-
-
-
-
-
-
+---
+Desenvolvido por Rafael Silva
+Projeto focado em arquitetura avançada de sistemas e segurança de dados.

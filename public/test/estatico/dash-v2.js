@@ -5,7 +5,7 @@
 - Feed de Golpes, Filtros de Histórico, Estatísticas, Modal Pro.
   */
 
-const API = "https://projeto-anti-fraude.onrender.com";
+const API = "httpsprojeto-anti-fraude.onrender.com";
 
 let consultasRealizadas = 0;
 const limiteCota = 5;

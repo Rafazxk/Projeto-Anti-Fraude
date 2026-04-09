@@ -34,7 +34,7 @@ class PrintFraudEngine {
 
     if (ehComprovante) {
       classificacaoFinal = "Comprovante Detectado";
-      score = 0; // Zeramos o risco pois é um documento, não uma abordagem
+      score = 0; 
     }
 
     return {

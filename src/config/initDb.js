@@ -4,7 +4,6 @@ export const setupDatabase = async () => {
   try {
     console.log("--- [DB] Iniciando criação das tabelas... ---");
     
-    // Aqui você cola o script SQL que te mandei acima, dentro da crase
     const sql = `
       CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
       

@@ -37,6 +37,7 @@ class ConsultaController {
 
      
       if (tipo === 'print') {
+        console.log("chegou no controller")
         try {
           const jaExiste = await PrintRepository.findByHash(resultadoMotor.id_hash);
           if (!jaExiste) {

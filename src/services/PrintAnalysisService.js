@@ -5,17 +5,17 @@ import PrintFraudEngine from "../domain/engines/PrintFraudEngine.js";
 import PrintRepository from "../repositories/PrintRepository.js";
 
 class PrintAnalysisService {
-  async execute({ image_path }) { // Removido user_id daqui, o Controller cuida disso
+  async execute({ image_path }) {  
     if (!image_path) {
       throw new Error("A imagem é obrigatória.");
     }
 
     try {
-      // 1. Gerar Hash para evitar reprocessar a mesma imagem (Economiza OCR)
+      
       const imageBuffer = fs.readFileSync(image_path);
       const id_hash = crypto.createHash('sha256').update(imageBuffer).digest('hex');
 
-      // 2. Verificar se já analisamos essa imagem antes
+      
       const analiseExistente = await PrintRepository.findByHash(id_hash);
       
       if (analiseExistente) {
@@ -27,20 +27,20 @@ class PrintAnalysisService {
         }, id_hash);
       }
 
-      // 3. OCR - Extração de texto (Onde deu o log do "Olá, Boa tarde")
+      
       const text = await extractTextFromImage(image_path);
       console.log("debug - texto extraído do print:", text);
       
-      // 4. Engine de Fraude - Inteligência
+      console.log("etstaetsaesadhsjkadjsa")
+      
       const result = PrintFraudEngine.analyze(text);
 
-      // 5. Retornar apenas os dados processados
-      // O Controller se encarregará de chamar PrintRepository.save() e ConsultaRepository.create()
+      
       return this.formatResponse({
         score: result.score,
         classificacao: result.classificacao,
         fatores: result.fatoresDetectados,
-        texto_extraido: text // Adicionado para o Controller poder salvar
+        texto_extraido: text 
       }, id_hash);
 
     } catch (error) {
@@ -62,7 +62,7 @@ class PrintAnalysisService {
 
     return {
       id_hash,
-      texto_extraido, // Passando adiante para o Controller salvar no banco
+      texto_extraido, 
       score: Number(score),
       classificacao: classificacao,
       alertas: [...new Set(alertasHumanos)],

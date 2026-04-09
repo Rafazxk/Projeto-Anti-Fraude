@@ -66,7 +66,7 @@ document.getElementById('formulario-login').onsubmit = async function(e) {
             localStorage.setItem('guardix_token', dados.token);
             localStorage.setItem('usuario_nome', dados.nome || email.split('@')[0]);
             
-            window.location.href = "/dashboard";
+            window.location.href = "/guardix.html";
         } else {
             alert(dados.error || "Erro ao realizar login.");
         }

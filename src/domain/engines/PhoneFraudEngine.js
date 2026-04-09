@@ -22,6 +22,7 @@ class PhoneFraudEngine {
         if (result && result.score > 0 && result.message) {
           console.log(`Regra: ${rule.constructor.name } | ADICIONOU ${result.score} pts`)
           score += result.score;
+          riscos.push(result.message);
         }
       } catch (e) {
         console.error(`Erro na regra ${rule.constructor.name}:`, e.message);

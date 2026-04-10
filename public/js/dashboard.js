@@ -269,11 +269,22 @@ async function loadLiveAlerts() {
     try {
         const response = await fetch(`${API}/api/stats/live`);
         const data = await response.json();
-        container.innerHTML = data.map(item => `
-            <div class="live-feed-item">
-                <span style="color: var(--text-dim); font-size:.82rem;">${item.status}</span>
-                <span class="feed-badge ${item.total_denuncias > 5 ? 'feed-badge-danger' : 'feed-badge-warn'}">${item.total_denuncias} relatos</span>
-            </div>`).join('') || '<p>Nenhum alerta agora.</p>';
+        
+        container.innerHTML = data.map(item => {
+            // Converte para número para garantir a comparação
+            const total = parseInt(item.total_denuncias);
+            // Define se será "relato" ou "relatos"
+            const plural = total === 1 ? 'relato' : 'relatos';
+            const isPerigo = item.status === 'perigoso';
+
+            return `
+                <div class="live-feed-item">
+                    <span style="color: var(--text-dim); font-size:.82rem;">${item.status}</span>
+                    <span class="feed-badge ${total > 5 || isPerigo ? 'feed-badge-danger' : 'feed-badge-warn'}">
+                        ${total} ${plural}
+                    </span>
+                </div>`;
+        }).join('') || '<p>Nenhum alerta agora.</p>';
     } catch (e) {
         container.innerHTML = '<p>Sem conexão com a rede.</p>';
     }

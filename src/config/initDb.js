@@ -70,8 +70,9 @@ CREATE TABLE IF NOT EXISTS prints_analisados (
 );
 
 -- 8. Telefones Reportados
+DROP TABLE IF EXISTS telefones_reportados CASCADE;
 
-CREATE TABLE IF NOT EXISTS telefones_reportados (
+CREATE TABLE telefones_reportados (
     telefone_id SERIAL PRIMARY KEY,
     consulta_id integer UNIQUE REFERENCES consultas(consulta_id),
     numero varchar NOT NULL,

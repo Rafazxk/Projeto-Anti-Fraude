@@ -20,7 +20,12 @@ router.get('/stats/live', async (req, res) => {
     `);
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: "Erro ao buscar stats" });
+    res.status(500).json({ 
+      error: "Erro ao buscar stats",
+      details: err.message,
+      hint: "verifique se a tabela telefones_reportados existe"
+  
+    });
   }
 });
 router.post('/print', authMiddleware, upload.single('imagem'), ConsultaController.analisarPrint);

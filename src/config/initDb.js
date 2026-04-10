@@ -70,16 +70,26 @@ CREATE TABLE IF NOT EXISTS prints_analisados (
 );
 
 -- 8. Telefones Reportados
+
 CREATE TABLE IF NOT EXISTS telefones_reportados (
     telefone_id SERIAL PRIMARY KEY,
     consulta_id integer UNIQUE REFERENCES consultas(consulta_id),
     numero varchar NOT NULL,
-    denuncias integer DEFAULT 0,
+    denuncias integer DEFAULT 1,
     score_spam numeric,
     operadora varchar,
-    status varchar
+    status varchar DEFAULT 'suspeito',
+    data_criacao timestamp DEFAULT CURRENT_TIMESTAMP -- COLUNA QUE FALTA AQUI
 );
-      
+
+-- Script para popular dados iniciais (Seed)
+-- Usamos 'ON CONFLICT' para não duplicar dados se o script rodar de novo
+INSERT INTO telefones_reportados (numero, status, denuncias)
+VALUES 
+('11987654321', 'perigoso', 15),
+('21912345678', 'suspeito', 5),
+('81999887766', 'perigoso', 22)
+ON CONFLICT DO NOTHING;
       
       
     `;

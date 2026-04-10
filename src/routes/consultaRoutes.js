@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import ConsultaController from '../controllers/ConsultaController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import pool from '../config/database.js';
 import upload from '../middleware/upload.js';
 
 const router = Router();

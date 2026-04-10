@@ -9,7 +9,7 @@ const router = Router();
 router.post('/link', authMiddleware, ConsultaController.analisarLink);
 router.post('/phone', authMiddleware, ConsultaController.analisarTelefone);
 router.get('/historico', authMiddleware, ConsultaController.obterHistorico);
-router.get('/api/stats/live', async (req, res) => {
+router.get('/stats/live', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT status, COUNT(*) as total_denuncias 

@@ -19,7 +19,7 @@ class UserController {
       
       const resposta = {
         user: {
-          id: user.user.id,
+          id: user.user_id,
           email: user.email
         },
         token

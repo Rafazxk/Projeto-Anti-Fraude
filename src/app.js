@@ -37,15 +37,12 @@ app.get('/inicio-guardix', (req, res) => {
 
 app.use("/users", userRoutes);
 app.use("/api", consultaRoutes);
-
-
+   
 app.use((req, res, next) => {
    
     if (req.path.startsWith('/api') || req.path.startsWith('/users')) {
         return res.status(404).json({ error: "Rota de API não encontrada." });
     }
-
-   
    
    
     const indexPath = path.join(publicPath, 'index.html');

@@ -37,13 +37,25 @@ class UserService {
    //gerar token 
    
    const token = jwt.sign(
-     { user_id: user.user_id },
+     { user_id: user.user_id,
+      email: user.email
+     },
      process.env.JWT_SECRET, 
      { expiresIn: "1d" }
      );
-
+ 
+   console.log("TOKEN USUARIO NO SERVICE: ", token);
+ 
     return { user, token };
   }
+  
+async virarPro(userId) {
+ 
+  const user = await UserRepository.findById(userId);
+  if (!user) throw new Error("Usuário não encontrado.");
+
+  return await UserRepository.updatePlan(userId, 'pro');
+}
 }
 
 export default new UserService();

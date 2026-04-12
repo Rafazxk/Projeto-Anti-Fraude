@@ -1,6 +1,6 @@
 // --- CONFIGURAÇÕES ---
 const URL_API = "https://projeto-anti-fraude.onrender.com";
-
+// const URL_API = "http://localhost:3000";
 // --- LÓGICA DE INTERFACE ---
 function abrirModal() {
     document.getElementById('modal-autenticacao').style.display = 'flex';

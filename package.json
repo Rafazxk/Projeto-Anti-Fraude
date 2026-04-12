@@ -2,13 +2,14 @@
   "devDependencies": {
     "eslint": "^10.0.2",
     "globals": "^17.3.0",
-    "jest": "^30.3.0"
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2"
   },
   "name": "antifraude",
   "version": "1.0.0",
   "type": "module",
   "description": "** documentação ***",
-  "main": "index.js",
+  "main": "src/server.js",
   "dependencies": {
     "acorn": "^8.16.0",
     "acorn-jsx": "^5.3.2",
@@ -66,6 +67,7 @@
     "punycode": "^2.3.1",
     "shebang-command": "^2.0.0",
     "shebang-regex": "^3.0.0",
+    "stripe": "^22.0.1",
     "tesseract.js": "^7.0.0",
     "type-check": "^0.4.0",
     "uri-js": "^4.4.1",
@@ -74,7 +76,7 @@
     "yocto-queue": "^0.1.0"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
   "author": "",

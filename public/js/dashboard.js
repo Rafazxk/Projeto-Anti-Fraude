@@ -1,19 +1,19 @@
 /**
  * GUARDIX DASH v2 — dashboard.js
- * Versão corrigida para Deploy (Aspas e Sintaxe)
  */
 
 const API = "https://projeto-anti-fraude.onrender.com";
+// const API = "http://localhost:3000";
 
 let consultasRealizadas = 0;
 const limiteCota = 5;
 let historicoCompleto = []; 
 let ultimoScore = 0;        
-let stepInterval = null; // Armazena o intervalo para poder limpá-lo
+let stepInterval = null; 
 
-// ============================================================
+  // ==============
 // 1. INICIALIZAÇÃO
-// ============================================================
+  // ==============
 window.onload = function () {
     const token = localStorage.getItem('guardix_token');
     const nomeUsuario = localStorage.getItem('usuario_nome') || 'Usuário';
@@ -271,9 +271,9 @@ async function loadLiveAlerts() {
         const data = await response.json();
         
         container.innerHTML = data.map(item => {
-            // Converte para número para garantir a comparação
+
             const total = parseInt(item.total_denuncias);
-            // Define se será "relato" ou "relatos"
+
             const plural = total === 1 ? 'relato' : 'relatos';
             const isPerigo = item.status === 'perigoso';
 
@@ -340,8 +340,10 @@ function abrirModalPro(e) {
 }
 
 function fecharModalPro(e) {
-    if (e && e.target.id === 'modal-pro') {
-        document.getElementById('modal-pro').style.display = 'none';
+   const modal = document.getElementById('modal-pro');
+  
+    if (!e || e.target.id === 'modal-pro') {
+       modal.style.display = 'none';
     }
 }
 
@@ -375,6 +377,54 @@ function iniciarStepAnimation() {
     }, 1200);
 }
 
+async function assinarPro() {
+  
+    const token = localStorage.getItem("guardix_token"); 
+
+    if (!token) {
+        alert("Você precisa estar logado para assinar o plano Pro!");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API}/users/pagamento/virar/pro`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`, 
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log("Sucesso:", data);
+            alert("Parabéns! Sua conta agora é Pro.");
+            // Dica: Recarregue a página ou atualize o botão aqui
+            window.location.reload(); 
+        } else {
+            console.error("Erro do servidor:", data.error);
+            alert("Erro: " + data.error);
+        }
+    } catch (error) {
+        console.error("Erro de conexão:", error);
+        alert("Erro ao conectar com o servidor.");
+    }
+}
+
+async function fazerRequisicao(url, options = {}) {
+  const response = await fetch(url, options);
+  
+  if(response.status === 401) {
+    alert("Sua sessão expirou. Por favor, faça login novamente. ");
+    localStorage.removeItem('token');
+    window.location.href = './index.html';
+    return;
+  }
+  return response;
+}
+
+
 function carregarEstatisticas() {
-    // Implementar conforme sua API de stats
+    
 }

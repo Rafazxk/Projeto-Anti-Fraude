@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import ConsultaController from '../controllers/ConsultaController.js';
+import WebhookController from '../controllers/WebhookController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import pool from '../config/database.js';
 import upload from '../middleware/upload.js';
+import express from 'express';
+
 
 const router = Router();
 
@@ -29,5 +32,6 @@ router.get('/stats/live', async (req, res) => {
   }
 });
 router.post('/print', authMiddleware, upload.single('imagem'), ConsultaController.analisarPrint);
+router.post('/api/webhook', express.raw({ type: 'application/json' }), WebhookController.handle);
 
 export default router;

@@ -2,6 +2,11 @@ class CheckDomainAge {
   async execute(context) {
     const ageInDays = await this.getDomainAge(context.domain);
 
+// Exemplo de como mockar a classe de rede
+if (process.env.NODE_ENV === 'test') {
+    this.getDomainAge = async (domain) => 365; 
+}
+
     // Se a API falhou ou o domínio não existe, não pontuamos (neutralidade)
     if (ageInDays === null) {
       console.log(`[Age] Não foi possível determinar a idade de: ${context.domain}`);

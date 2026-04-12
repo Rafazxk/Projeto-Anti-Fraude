@@ -333,11 +333,11 @@
 
 <!-- ======= MODAL PRO ======= -->
 <div id="modal-pro" class="modal-overlay" style="display:none;" onclick="fecharModalPro(event)">
-    <div class="modal-box">
+    <div class="modal-box" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="fecharModalPro()"><i class="fas fa-times"></i></button>
         <div class="modal-badge">PRO</div>
         <h3 class="modal-title">Recurso Exclusivo Pro</h3>
-        <p class="modal-text">Esta funcionalidade está disponível apenas para assinantes do plano Pro. Desbloqueie análises avançadas, detalhes técnicos e muito mais.</p>
+        <p class="modal-text">Esta funcionalidade está disponível apenas para assinantes do plano Pro.</p>
         <button onclick="assinarPro()" class="btn-pro-cta" style="width:100%; margin-top:1.5rem;">
             Assinar Agora &mdash; R$ 29,90/mês
         </button>

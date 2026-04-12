@@ -14,8 +14,12 @@ export default function authMiddleware(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: decoded.id || decoded.user_id }; 
+    req.user = {
+      id: decoded.user_id,
+      email: decoded.email
+     }; 
     console.log("Middleware: token ok - id:", req.user.id);
+    console.log("middleware: email ok -", req.user.email);
     
     next(); 
     

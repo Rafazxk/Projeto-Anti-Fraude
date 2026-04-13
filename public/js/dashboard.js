@@ -400,8 +400,8 @@ async function assinarPro() {
         if (response.ok) {
             console.log("Sucesso:", data);
             alert("Parabéns! Sua conta agora é Pro.");
-            // Dica: Recarregue a página ou atualize o botão aqui
-            window.location.reload(); 
+           
+            window.location.href('guardix-pro.html'); 
         } else {
             console.error("Erro do servidor:", data.error);
             alert("Erro: " + data.error);

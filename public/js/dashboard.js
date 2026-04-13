@@ -401,7 +401,7 @@ async function assinarPro() {
             console.log("Sucesso:", data);
             alert("Parabéns! Sua conta agora é Pro.");
            
-            window.location.href('guardix-pro.html'); 
+            window.location.href = "guardix-pro.html"; 
         } else {
             console.error("Erro do servidor:", data.error);
             alert("Erro: " + data.error);

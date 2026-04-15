@@ -34,7 +34,26 @@ window.onload = function () {
             ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
             : parts[0].substring(0, 2).toUpperCase();
     }
+      
+    // Captura o input e o span
+const inputArquivo = document.getElementById('arquivo-print');
+const spanNomeDoc = document.getElementById('nome-doc');
 
+// Adiciona o evento de mudança
+if (inputArquivo && spanNomeDoc) {
+    inputArquivo.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            // Pega o nome do arquivo e coloca no span
+            spanNomeDoc.innerText = this.files[0].name;
+            // Opcional: muda a cor para destacar que foi selecionado
+            spanNomeDoc.style.color = "var(--primary-color)"; 
+        } else {
+            spanNomeDoc.innerText = "Nenhum arquivo selecionado";
+            spanNomeDoc.style.color = "inherit";
+        }
+    });
+}  
+      
     atualizarInterfaceCota();
     carregarHistorico();
     loadLiveAlerts();

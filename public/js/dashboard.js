@@ -11,9 +11,9 @@ let historicoCompleto = [];
 let ultimoScore = 0;        
 let stepInterval = null; 
 
-  // ==============
-// 1. INICIALIZAÇÃO
-  // ==============
+
+// INICIALIZAÇÃO
+
 window.onload = function () {
     const token = localStorage.getItem('guardix_token');
     const nomeUsuario = localStorage.getItem('usuario_nome') || 'Usuário';
@@ -23,7 +23,6 @@ window.onload = function () {
         return;
     }
 
-    // Avatar e nome
     const nomeEl = document.querySelector('.info-user .nome');
     if (nomeEl) nomeEl.innerText = nomeUsuario;
 
@@ -35,17 +34,16 @@ window.onload = function () {
             : parts[0].substring(0, 2).toUpperCase();
     }
       
-    // Captura o input e o span
+
 const inputArquivo = document.getElementById('arquivo-print');
 const spanNomeDoc = document.getElementById('nome-doc');
 
-// Adiciona o evento de mudança
 if (inputArquivo && spanNomeDoc) {
     inputArquivo.addEventListener('change', function() {
         if (this.files && this.files.length > 0) {
-            // Pega o nome do arquivo e coloca no span
+          
             spanNomeDoc.innerText = this.files[0].name;
-            // Opcional: muda a cor para destacar que foi selecionado
+           
             spanNomeDoc.style.color = "var(--primary-color)"; 
         } else {
             spanNomeDoc.innerText = "Nenhum arquivo selecionado";
@@ -72,14 +70,21 @@ function navegar(e, idAlvo) {
         s.classList.remove('active');
     });
 
+   
+
     const secao = document.getElementById(`secao-${idAlvo}`);
     if (secao) { 
         secao.style.display = 'block'; 
         secao.classList.add('active'); 
     }
-
+   
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     if (e && e.currentTarget) e.currentTarget.classList.add('active');
+
+      if(idAlvo === "relatorios"){
+        console.log("clicou");
+      carregarEstatisticas();
+    }
 
     if (window.innerWidth < 768) {
         const sidebar = document.getElementById('sidebar');
@@ -92,9 +97,8 @@ function alternarMenu() {
     if (sidebar) sidebar.classList.toggle('ativo');
 }
 
-// ============================================================
 // 3. FORMULÁRIO DE ANÁLISE
-// ============================================================
+
 const formAnalise = document.getElementById('form-analise-interna');
 if (formAnalise) {
     formAnalise.onsubmit = async function (e) {
@@ -172,9 +176,8 @@ if (formAnalise) {
     };
 }
 
-// ============================================================
-// 4. RENDERIZAÇÃO DO RESULTADO
-// ============================================================
+//  RENDERIZAÇÃO DO RESULTADO
+
 function renderizarResultado(data) {
     ultimoScore = data.score || 0;
     const isPerigo = ultimoScore >= 60;
@@ -254,9 +257,9 @@ function extrairPontosAtencao(data) {
     return pontos;
 }
 
-// ============================================================
-// 5. REPORTAR E COTA
-// ============================================================
+
+// REPORTAR E COTA
+
 async function reportarAmeaca() {
     const token = localStorage.getItem('guardix_token');
     try {
@@ -279,9 +282,9 @@ function atualizarInterfaceCota() {
     if (barra)    barra.style.width  = `${(consultasRealizadas / limiteCota) * 100}%`;
 }
 
-// ============================================================
-// 6. FEEDS E STATS
-// ============================================================
+
+// FEEDS E STATS
+
 async function loadLiveAlerts() {
     const container = document.getElementById('live-alerts');
     if (!container) return;
@@ -350,10 +353,32 @@ function renderizarHistorico(dados) {
         </tr>`).join('');
 }
 
-// ============================================================
-// 7. UTILITÁRIOS (MODAL, TOAST, ETC)
-// ============================================================
-// Abrir e fechar modal
+// RELATORIOS 
+
+async function carregarEstatisticas() {
+    try {
+        const response = await fetch(`${API}/api/estatisticas`);
+        const stats = await response.json();
+
+        // Preenche os IDs que você tem no HTML
+        document.getElementById('stat-total').innerText = stats.total_consultas || 0;
+        document.getElementById('stat-ameacas').innerText = stats.ameacas_evitadas || 0;
+        document.getElementById('stat-reportados').innerText = stats.total_reportados || 0;
+        
+        // Exemplo de cálculo para Risco Médio
+        const riscoMedio = stats.total_consultas > 0 ? 
+            ((stats.ameacas_evitadas / stats.total_consultas) * 100).toFixed(0) + '%' : '0%';
+        document.getElementById('stat-risco').innerText = riscoMedio;
+
+    } catch (error) {
+        console.error("Erro ao carregar estatísticas:", error);
+    }
+}
+
+
+
+// UTILITÁRIOS (MODAL, TOAST, ETC)
+
 function abrirModalReporte(e) {
     if(e) e.preventDefault();
     document.getElementById('modal-reporte').style.display = 'flex';
@@ -394,7 +419,8 @@ async function executarReporte() {
         if (response.ok) {
             alert("Denúncia enviada com sucesso! Obrigado por proteger a rede.");
             fecharModalReporte();
-            // Limpa o formulário
+          
+          
             document.getElementById('form-reporte').reset();
         } else {
             alert("Erro ao enviar denúncia. Tente novamente.");

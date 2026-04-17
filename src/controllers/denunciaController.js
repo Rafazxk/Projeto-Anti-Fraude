@@ -30,6 +30,23 @@ const listarFeed = async (req, res) => {
     }
  };
 
+const listarEstatisticas = async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                (SELECT COUNT(*) FROM consultas) as total_consultas,
+                (SELECT COUNT(*) FROM telefones_reportados WHERE status = 'bloqueado') + 
+                (SELECT COUNT(*) FROM links_reportados WHERE status = 'bloqueado') as ameacas_evitadas,
+                (SELECT COUNT(*) FROM telefones_reportados) + 
+                (SELECT COUNT(*) FROM links_reportados) as total_reportados;
+        `;
+        const result = await db.query(query);
+        res.json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao buscar estatísticas" });
+    }
+};
+
 const criarDenuncia = async (req, res) => {
     const { tipo, valor, descricao } = req.body;
     try {
@@ -52,5 +69,6 @@ const criarDenuncia = async (req, res) => {
 
 export default {
   listarFeed,
+  listarEstatisticas,
   criarDenuncia
 };

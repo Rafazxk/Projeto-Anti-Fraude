@@ -179,21 +179,24 @@ if (formAnalise) {
 //  RENDERIZAÇÃO DO RESULTADO
 
 function renderizarResultado(data) {
-    ultimoScore = data.score || 0;
-    const isPerigo = ultimoScore >= 60;
-    const isAltaAmeaca = ultimoScore >= 70;
+    // Normaliza o score para exibição (máximo 100)
+    const scoreExibicao = Math.min(data.score || 0, 100);
+    const isPerigo = data.score >= 60;
+    const isAltaAmeaca = data.score >= 100;
 
     const cor    = isPerigo ? 'var(--danger)' : 'var(--success)';
     const icone  = isPerigo ? 'fa-triangle-exclamation' : 'fa-circle-check';
     const gradId = isPerigo ? 'url(#gaugeGradientDanger)' : 'url(#gaugeGradientSafe)';
 
-    animarGauge(ultimoScore, gradId);
+    // Chama a animação com o score normalizado
+    animarGauge(scoreExibicao, gradId);
     
-    document.getElementById('gauge-number').style.color = cor;
+    // Ajusta o label para refletir o perigo real
     const gaugeLabel = document.getElementById('gauge-label');
     if (gaugeLabel) {
         gaugeLabel.style.color = cor;
-        gaugeLabel.innerText = isPerigo ? 'ALTO RISCO' : 'SEGURO';
+        // Se score > 100, exibe ALTO RISCO, senão o seu padrão
+        gaugeLabel.innerText = data.score > 100 ? 'RISCO CRÍTICO' : (isPerigo ? 'ALTO RISCO' : 'SEGURO');
     }
 
     document.getElementById('result-header').innerHTML = `
@@ -208,7 +211,7 @@ function renderizarResultado(data) {
 
     if (pontos.length > 0 && listaEl) {
         listaEl.innerHTML = pontos.map(p =>
-            `<li><i class="fas fa-circle-dot" style="color:${p.cor}; font-size:.5rem;"></i> ${p.texto}</li>`
+            `<li><i class="fas fa-circle-dot" style="color:${p.cor}; margin-right:8px;"></i> ${p.texto}</li>`
         ).join('');
         pontosBox.style.display = 'block';
     } else if (pontosBox) {
@@ -216,7 +219,7 @@ function renderizarResultado(data) {
     }
 
     const btnReportar = document.getElementById('btn-reportar');
-    if (btnReportar) btnReportar.style.display = isAltaAmeaca ? 'flex' : 'none';
+    if (btnReportar) btnReportar.style.display = isPerigo ? 'flex' : 'none';
 }
 
 function animarGauge(score, gradId) {
@@ -247,13 +250,19 @@ function animarGauge(score, gradId) {
 
 function extrairPontosAtencao(data) {
     const pontos = [];
+    
+
+    if (data.detalhes?.tipoGolpe && !["Nenhum", "Análise Padrão", "Indeterminado"].includes(data.detalhes.tipoGolpe)) {
+        pontos.push({ texto: `Classificação: ${data.detalhes.tipoGolpe}`, cor: 'var(--danger)' });
+    }
+
     if (data.flags && Array.isArray(data.flags)) {
         data.flags.forEach(f => pontos.push({ texto: f, cor: 'var(--warn)' }));
-        return pontos;
     }
+    
     if (data.score >= 70) pontos.push({ texto: 'Alvo associado a relatos de fraude', cor: 'var(--danger)' });
     if (data.score >= 50) pontos.push({ texto: 'Padrão suspeito detectado nos dados', cor: 'var(--warn)' });
-    if (data.score < 30)  pontos.push({ texto: 'Nenhum padrão de risco identificado', cor: 'var(--success)' });
+    
     return pontos;
 }
 

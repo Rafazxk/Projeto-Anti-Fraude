@@ -356,16 +356,16 @@ function renderizarHistorico(dados) {
 // RELATORIOS 
 
 async function carregarEstatisticas() {
+  console.log("entrou");
     try {
         const response = await fetch(`${API}/api/estatisticas`);
         const stats = await response.json();
 
-        // Preenche os IDs que você tem no HTML
         document.getElementById('stat-total').innerText = stats.total_consultas || 0;
         document.getElementById('stat-ameacas').innerText = stats.ameacas_evitadas || 0;
         document.getElementById('stat-reportados').innerText = stats.total_reportados || 0;
-        
-        // Exemplo de cálculo para Risco Médio
+ 
+
         const riscoMedio = stats.total_consultas > 0 ? 
             ((stats.ameacas_evitadas / stats.total_consultas) * 100).toFixed(0) + '%' : '0%';
         document.getElementById('stat-risco').innerText = riscoMedio;
@@ -531,9 +531,4 @@ async function fazerRequisicao(url, options = {}) {
     return;
   }
   return response;
-}
-
-
-function carregarEstatisticas() {
-    
 }

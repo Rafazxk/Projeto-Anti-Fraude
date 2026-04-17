@@ -59,9 +59,9 @@ if (inputArquivo && spanNomeDoc) {
     carregarEstatisticas();
 };
 
-// ============================================================
-// 2. NAVEGAÇÃO
-// ============================================================
+
+// NAVEGAÇÃO
+
 function navegar(e, idAlvo) {
     if (e) e.preventDefault();
 
@@ -108,7 +108,7 @@ if (formAnalise) {
         const phone = document.getElementById("input-tel")?.value.trim();
         const file  = document.getElementById("arquivo-print")?.files[0];
 
-        const resBox   = document.getElementById('resultado-analise');
+        const resBox = document.getElementById('resultado-analise');
         const veredito = document.getElementById('veredito');
         const loading  = document.getElementById('loading-container');
         const token    = localStorage.getItem('guardix_token');
@@ -119,7 +119,7 @@ if (formAnalise) {
         }
 
         if (!link && !phone && !file) {
-            showToast("⚠️ Preencha ao menos um campo.", "error");
+            showToast("Preencha ao menos um campo.", "error");
             return;
         }
 

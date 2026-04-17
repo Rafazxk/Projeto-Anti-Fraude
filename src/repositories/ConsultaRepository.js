@@ -18,7 +18,7 @@ class ConsultaRepository {
   const query = `
     SELECT *
     FROM consultas
-    WHERE user_id = $1::uuid  -- O "::uuid" garante a comparação correta
+    WHERE user_id = $1::uuid 
     ORDER BY data_consulta DESC;
   `;
   const result = await pool.query(query, [user_id]);

@@ -11,8 +11,11 @@ class ConsultaController {
     try {
       const user_id = req.user.id;
       let resultadoMotor;
+      
+      let valorIdentificado = tipo === 'link' ? req.body.url : (tipo === 'telefone' ? req.body.numero : 'Print/Imagem');
+let tipoRequisicao = tipo;
 
-      // 1. Decisão de qual motor acionar (Apenas inteligência)
+      // Decisão de qual motor acionar 
       switch (tipo) {
         case 'link':
           resultadoMotor = await LinkAnalysisService.execute({ url: req.body.url });
@@ -37,7 +40,6 @@ class ConsultaController {
 
      
       if (tipo === 'print') {
-        console.log("chegou no controller")
         try {
           const jaExiste = await PrintRepository.findByHash(resultadoMotor.id_hash);
           if (!jaExiste) {
@@ -54,13 +56,19 @@ class ConsultaController {
           console.warn("Aviso: Falha ao salvar detalhes do print, mas a consulta foi gravada.");
         }
       }
-
-      // 4. Resposta para o Frontend
-      return res.json({
-        score: resultadoMotor.score,
-        classificacao: resultadoMotor.classificacao || resultadoMotor.nivel,
-        conclusao: resultadoMotor.conclusao || (resultadoMotor.score >= 60 ? "Risco Detectado" : "Parece Seguro")
-      });
+// Resposta para o Frontend
+return res.json({
+  score: resultadoMotor.score,
+  classificacao: resultadoMotor.classificacao || resultadoMotor.nivel,
+  conclusao: resultadoMotor.conclusao || (resultadoMotor.score >= 60 ? "Risco Detectado" : "Parece Seguro"),
+  detalhes: {
+    tipo: tipoRequisicao,
+    tipoGolpe: resultadoMotor.tipoGolpe || "Indeterminado", // Usando o resultadoMotor!
+    valor: valorIdentificado,
+    denuncias: resultadoMotor.denuncias || 0,
+    servico: resultadoMotor.servico || "Análise Padrão"
+  }
+});
 
     } catch (error) {
       console.error(`Erro na análise de ${tipo}:`, error);

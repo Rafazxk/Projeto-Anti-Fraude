@@ -1,15 +1,31 @@
 import PhoneFraudEngine from "../domain/engines/PhoneFraudEngine.js";
+import PhoneReportsRepository from "../repositories/PhoneReportsRepository.js"; 
 
-class PhoneAnalysisService{
+class PhoneAnalysisService {
   async execute({ numero }) {
-    
-    if(!numero){
-      throw new Error("telefone é obrigatorio");
+    if (!numero) {
+      throw new Error("Telefone é obrigatório");
     }
+
+    const numeroLimpo = numero.replace(/\D/g, '');
+
+   
+    const result = await PhoneFraudEngine.analyze(numeroLimpo);
     
-    const result = await PhoneFraudEngine.analyze(numero);
+    const totalDenuncias = await PhoneReportsRepository.countReports(numeroLimpo);
     
-    return result;
+
+    let tipoGolpe = "Análise Padrão";
+    if (totalDenuncias > 20) tipoGolpe = "Fraude de Alta Recorrência";
+    else if (result.score >= 100) tipoGolpe = "Engenharia Social / Fraude";
+    else if (result.score >= 50) tipoGolpe = "Suspeita de Atividade Maliciosa";
+
+    return {
+      ...result,
+      tipoGolpe,
+      denuncias: totalDenuncias,
+      servico: "Guardix Phone Intelligence"
+    };
   }
 }
 

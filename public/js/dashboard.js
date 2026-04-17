@@ -195,7 +195,7 @@ function renderizarResultado(data) {
     const gaugeLabel = document.getElementById('gauge-label');
     if (gaugeLabel) {
         gaugeLabel.style.color = cor;
-        // Se score > 100, exibe ALTO RISCO, senão o seu padrão
+        
         gaugeLabel.innerText = data.score > 100 ? 'RISCO CRÍTICO' : (isPerigo ? 'ALTO RISCO' : 'SEGURO');
     }
 
@@ -251,15 +251,21 @@ function animarGauge(score, gradId) {
 function extrairPontosAtencao(data) {
     const pontos = [];
     
-
-    if (data.detalhes?.tipoGolpe && !["Nenhum", "Análise Padrão", "Indeterminado"].includes(data.detalhes.tipoGolpe)) {
-        pontos.push({ texto: `Classificação: ${data.detalhes.tipoGolpe}`, cor: 'var(--danger)' });
+    // FORÇAR a leitura do tipo de golpe
+    const tipo = data.detalhes?.tipoGolpe;
+    if (tipo && tipo !== 'Indeterminado' && tipo !== 'Análise Padrão') {
+        pontos.push({ 
+            texto: `Classificação: ${tipo}`, 
+            cor: 'var(--danger)' 
+        });
     }
 
+    // Se houver flags técnicas do motor, adicione-as
     if (data.flags && Array.isArray(data.flags)) {
         data.flags.forEach(f => pontos.push({ texto: f, cor: 'var(--warn)' }));
     }
     
+    // Regras de score
     if (data.score >= 70) pontos.push({ texto: 'Alvo associado a relatos de fraude', cor: 'var(--danger)' });
     if (data.score >= 50) pontos.push({ texto: 'Padrão suspeito detectado nos dados', cor: 'var(--warn)' });
     

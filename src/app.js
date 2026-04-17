@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 
 import userRoutes from "./routes/userRoutes.js";
 import consultaRoutes from "./routes/consultaRoutes.js";
+import denunciaRoutes from "./routes/denunciaRoutes.js";
 
 const app = express();
 
@@ -37,7 +38,8 @@ app.get('/inicio-guardix', (req, res) => {
 
 app.use("/users", userRoutes);
 app.use("/api", consultaRoutes);
-   
+app.use("/api", denunciaRoutes);
+
 app.use((req, res, next) => {
    
     if (req.path.startsWith('/api') || req.path.startsWith('/users')) {

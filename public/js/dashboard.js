@@ -353,6 +353,70 @@ function renderizarHistorico(dados) {
 // ============================================================
 // 7. UTILITÁRIOS (MODAL, TOAST, ETC)
 // ============================================================
+// Abrir e fechar modal
+function abrirModalReporte(e) {
+    if(e) e.preventDefault();
+    document.getElementById('modal-reporte').style.display = 'flex';
+}
+
+function fecharModalReporte(e) {
+    if(!e || e.target.className === 'modal-overlay') {
+        document.getElementById('modal-reporte').style.display = 'none';
+    }
+}
+
+// Enviar para a API
+async function executarReporte() {
+    const dados = {
+        tipo: document.getElementById('report-tipo').value,
+        valor: document.getElementById('report-valor').value,
+        descricao: document.getElementById('report-desc').value
+    };
+
+    // Validação simples
+    if (dados.tipo === 'telefone' && !valor.match(/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/)) {
+        alert("Ops! Parece que esse número não está no formato correto.");
+        return;
+    }
+    
+    if (dados.tipo === 'link' && !dados.valor.startsWith('http')) {
+        alert("Por favor, insira um link completo (com http ou https).");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API}/api/reportar-direto`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        if (response.ok) {
+            alert("Denúncia enviada com sucesso! Obrigado por proteger a rede.");
+            fecharModalReporte();
+            // Limpa o formulário
+            document.getElementById('form-reporte').reset();
+        } else {
+            alert("Erro ao enviar denúncia. Tente novamente.");
+        }
+    } catch (err) {
+        console.error("Erro:", err);
+    }
+}
+
+function atualizarPlaceholder() {
+    const tipo = document.getElementById('report-tipo').value;
+    const input = document.getElementById('report-valor');
+    
+    if (tipo === 'link') {
+        input.placeholder = "Ex: https://banco-falso.com";
+        input.type = "url";
+    } else {
+        input.placeholder = "Ex: (81) 99999-9999";
+        input.type = "tel";
+    }
+}
+
 function abrirModalPro(e) {
     if (e) e.preventDefault();
     document.getElementById('modal-pro').style.display = 'flex';

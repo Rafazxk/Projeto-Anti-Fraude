@@ -46,12 +46,16 @@
         </a>
 
         <p class="nav-label" style="margin-top:1.5rem;">PREMIUM</p>
+        <p class="nav-label" style="margin-top:1.5rem;">AÇÕES</p> <a href="#" class="nav-item" onclick="abrirModalReporte(event)">
+    <i class="fas fa-flag"></i>
+    <span>Denunciar Golpe</span>
+</a>
         <a href="#" class="nav-item nav-premium" onclick="abrirModalPro(event)">
             <i class="fas fa-map-pin"></i>
             <span>Verificador de IP</span>
             <span class="nav-badge nav-badge-lock"><i class="fas fa-lock"></i></span>
         </a>
-
+       
         <a href="#" class="nav-item nav-upgrade" onclick="navegar(event, 'pro')">
             <i class="fas fa-rocket"></i>
             <span>Virar Pro</span>
@@ -85,7 +89,7 @@
             <div class="quota-widget">
                 <div class="quota-label">
                     <span>Cota Diária</span>
-                    <strong id="contagem-cota">0/5</strong>
+                    <strong id="contagem-cota">0/10</strong>
                 </div>
                 <div class="quota-bar">
                     <div id="progresso-cota" class="quota-fill" style="width:0%"></div>
@@ -344,7 +348,30 @@
         <button onclick="fecharModalPro()" class="btn-modal-cancel">Talvez depois</button>
     </div>
 </div>
+<div id="modal-reporte" class="modal-overlay" style="display:none;" onclick="fecharModalReporte(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="fecharModalReporte()"><i class="fas fa-times"></i></button>
+        <h3 class="modal-title"><i class="fas fa-flag"></i> Reportar Ameaça</h3>
+        <p class="modal-text">Ajude a comunidade a se proteger. Envie um link ou telefone suspeito.</p>
+        
+        <form id="form-reporte" style="margin-top:1.5rem;">
+    <label style="display:block; margin-bottom:5px; color:var(--text-dim);">O que você deseja reportar?</label>
+    <select id="report-tipo" class="field-input" onchange="atualizarPlaceholder()" style="margin-bottom:15px;">
+        <option value="link">Link Suspeito</option>
+        <option value="telefone">Número de Telefone</option>
+    </select>
 
+    <label style="display:block; margin-bottom:5px; color:var(--text-dim);">Informação da denúncia:</label>
+    <input type="text" id="report-valor" class="field-input" placeholder="Insira o link aqui..." required>
+    
+    <textarea id="report-desc" class="field-input" placeholder="Breve descrição do golpe..." style="height:80px; margin-top:10px;"></textarea>
+    
+    <button type="button" onclick="executarReporte()" class="btn-analyze" style="width:100%; margin-top:15px;">
+        Enviar Denúncia
+    </button>
+</form>
+    </div>
+</div>
 <!-- ======= TOAST ======= -->
 <div id="toast" class="toast"></div>
 

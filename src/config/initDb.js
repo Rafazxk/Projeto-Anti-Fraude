@@ -83,6 +83,16 @@ CREATE TABLE telefones_reportados (
     data_criacao timestamp DEFAULT CURRENT_TIMESTAMP -- COLUNA QUE FALTA AQUI
 );
 
+-- links reportados 
+CREATE TABLE links_reportados (
+    link_id SERIAL PRIMARY KEY,
+    consulta_id INTEGER UNIQUE REFERENCES consultas(consulta_id),
+    url VARCHAR NOT NULL,
+    denuncias INTEGER DEFAULT 1,
+    status VARCHAR DEFAULT 'suspeito',
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Script para popular dados iniciais (Seed)
 -- Usamos 'ON CONFLICT' para não duplicar dados se o script rodar de novo
 INSERT INTO telefones_reportados (numero, status, denuncias)

@@ -355,49 +355,44 @@ async function carregarHistorico() {
         lista.innerHTML = '<tr><td colspan="4">Erro de conexão.</td></tr>';
     }
 }
-
 function renderizarHistorico(dados) {
     const lista = document.getElementById('lista-historico');
     if (!lista || !Array.isArray(dados)) return;
-    lista.innerHTML = dados.map(h => `
-        <tr>
+    
+    lista.innerHTML = dados.map(h => {
+        // Garantimos que o tipo esteja em minúsculo para o filtro funcionar
+        const tipoLimpo = (h.tipo || 'link').toLowerCase().trim();
+        
+        return `
+        <tr data-tipo="${tipoLimpo}">
             <td>${h.data || '---'}</td>
             <td>${h.tipo || 'link'}</td>
             <td>${h.alvo || 'N/A'}</td>
             <td>${h.resultado}</td>
-        </tr>`).join('');
+        </tr>`;
+    }).join('');
 }
-
 function filtrarHistorico(tipo, elemento) {
-    // 1. Atualizar interface dos botões
+    // Atualiza a classe ativa nos botões
     const abas = document.querySelectorAll('.filter-tab');
     abas.forEach(aba => aba.classList.remove('active'));
     elemento.classList.add('active');
 
-    // 2. Filtrar as linhas da tabela
     const linhas = document.querySelectorAll('#lista-historico tr');
     
     linhas.forEach(linha => {
-        // Ignora a linha de "Carregando" ou "Vazio" se ela existir
         if (linha.querySelector('.table-empty')) return;
 
-        // Pega o texto da coluna "Tipo" (segunda coluna - índice 1)
-        const tipoLinha = linha.cells[1].textContent.toLowerCase().trim();
+        // Pegamos o tipo direto do atributo que criamos na renderização
+        const tipoLinha = linha.getAttribute('data-tipo');
 
-        if (tipo === 'todos') {
+        if (tipo === 'todos' || tipoLinha === tipo) {
             linha.style.display = '';
         } else {
-            // Verifica se o tipo da linha corresponde ao filtro
-            // (ex: 'link', 'telefone' ou 'print')
-            if (tipoLinha.includes(tipo)) {
-                linha.style.display = '';
-            } else {
-                linha.style.display = 'none';
-            }
+            linha.style.display = 'none';
         }
     });
 }
-
 // RELATORIOS 
 
 async function carregarEstatisticas() {

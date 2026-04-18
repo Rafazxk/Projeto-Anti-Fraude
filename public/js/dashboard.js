@@ -362,12 +362,13 @@ function renderizarHistorico(dados) {
 
     lista.innerHTML = dados.map(h => {
        
-        const tipoSlug = (h.tipo || 'link').toLowerCase().trim();
+        const tipoReal = h.alvo || h.tipo_consulta || 'link';
+        const tipoSlug = tipoReal.toLowerCase().trim();
 
         return `
         <tr data-tipo="${tipoSlug}">
             <td>${h.data || '---'}</td>
-            <td>${h.tipo || 'link'}</td>
+            <td>${tipoReal.toUpperCase()}</td> 
             <td>${h.alvo || 'N/A'}</td>
             <td>${h.resultado}</td>
         </tr>`;

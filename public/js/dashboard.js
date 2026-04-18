@@ -368,6 +368,36 @@ function renderizarHistorico(dados) {
         </tr>`).join('');
 }
 
+function filtrarHistorico(tipo, elemento) {
+    // 1. Atualizar interface dos botões
+    const abas = document.querySelectorAll('.filter-tab');
+    abas.forEach(aba => aba.classList.remove('active'));
+    elemento.classList.add('active');
+
+    // 2. Filtrar as linhas da tabela
+    const linhas = document.querySelectorAll('#lista-historico tr');
+    
+    linhas.forEach(linha => {
+        // Ignora a linha de "Carregando" ou "Vazio" se ela existir
+        if (linha.querySelector('.table-empty')) return;
+
+        // Pega o texto da coluna "Tipo" (segunda coluna - índice 1)
+        const tipoLinha = linha.cells[1].textContent.toLowerCase().trim();
+
+        if (tipo === 'todos') {
+            linha.style.display = '';
+        } else {
+            // Verifica se o tipo da linha corresponde ao filtro
+            // (ex: 'link', 'telefone' ou 'print')
+            if (tipoLinha.includes(tipo)) {
+                linha.style.display = '';
+            } else {
+                linha.style.display = 'none';
+            }
+        }
+    });
+}
+
 // RELATORIOS 
 
 async function carregarEstatisticas() {

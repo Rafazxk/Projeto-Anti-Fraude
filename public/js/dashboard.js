@@ -355,16 +355,17 @@ async function carregarHistorico() {
         lista.innerHTML = '<tr><td colspan="4">Erro de conexão.</td></tr>';
     }
 }
+
 function renderizarHistorico(dados) {
     const lista = document.getElementById('lista-historico');
     if (!lista || !Array.isArray(dados)) return;
-    
+
     lista.innerHTML = dados.map(h => {
-        // Garantimos que o tipo esteja em minúsculo para o filtro funcionar
-        const tipoLimpo = (h.tipo || 'link').toLowerCase().trim();
-        
+       
+        const tipoSlug = (h.tipo || 'link').toLowerCase().trim();
+
         return `
-        <tr data-tipo="${tipoLimpo}">
+        <tr data-tipo="${tipoSlug}">
             <td>${h.data || '---'}</td>
             <td>${h.tipo || 'link'}</td>
             <td>${h.alvo || 'N/A'}</td>
@@ -372,24 +373,28 @@ function renderizarHistorico(dados) {
         </tr>`;
     }).join('');
 }
-function filtrarHistorico(tipo, elemento) {
-    // Atualiza a classe ativa nos botões
+
+function filtrarHistorico(tipoAlvo, elemento) {
+   
     const abas = document.querySelectorAll('.filter-tab');
     abas.forEach(aba => aba.classList.remove('active'));
     elemento.classList.add('active');
 
+   
     const linhas = document.querySelectorAll('#lista-historico tr');
     
     linhas.forEach(linha => {
-        if (linha.querySelector('.table-empty')) return;
+        
+        if (linha.classList.contains('table-empty') || linha.cells.length < 2) return;
 
-        // Pegamos o tipo direto do atributo que criamos na renderização
-        const tipoLinha = linha.getAttribute('data-tipo');
+        const tipoDaLinha = linha.getAttribute('data-tipo');
 
-        if (tipo === 'todos' || tipoLinha === tipo) {
-            linha.style.display = '';
+        if (tipoAlvo === 'todos') {
+            linha.style.display = ''; 
+        } else if (tipoDaLinha === tipoAlvo) {
+            linha.style.display = ''; 
         } else {
-            linha.style.display = 'none';
+            linha.style.display = 'none'; 
         }
     });
 }
